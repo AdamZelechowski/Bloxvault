@@ -19,7 +19,8 @@
       background-color: #ff6600;
     }
     .navbar-brand,
-    .nav-link {
+    .nav-link, 
+    .btn-link {
       color: #fff !important;
     }
     .card {
@@ -47,17 +48,18 @@
       <a class="navbar-brand" href="#">
         <img src="https://via.placeholder.com/150x40?text=Your+Logo" class="logo" alt="Logo" />
       </a>
-      <div class="d-flex ms-auto">
-        <a class="nav-link" href="#">Home</a>
-        <a class="nav-link" href="#">Rewards</a>
-        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+      <div class="d-flex ms-auto gap-3">
+        <button class="btn btn-link nav-link text-white" onclick="showDashboard()">Home</button>
+        <button class="btn btn-link nav-link text-white" onclick="showRewards()">Rewards</button>
+        <button class="btn btn-link nav-link text-white" onclick="logout()">Logout</button>
       </div>
     </div>
   </nav>
 
   <!-- Main Content -->
   <div class="container py-5">
-    <div class="card p-4 shadow">
+
+    <div id="dashboard" class="card p-4 shadow">
       <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
       <p class="text-center">Points: <span id="points">0</span></p>
 
@@ -83,10 +85,37 @@
         <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
       </div>
     </div>
+
+    <div id="rewards" style="display:none;" class="card p-4 shadow mt-4">
+      <h2 class="text-center mb-3">Rewards</h2>
+      <p class="text-center">Here’s where you can explore future rewards or bonus offers.</p>
+      <div class="text-center">🚧 Work in progress...</div>
+    </div>
+
   </div>
 
   <!-- Firebase App Logic -->
   <script type="module" src="app.js"></script>
 
+  <!-- Navigation Script -->
+  <script>
+    function showDashboard() {
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("rewards").style.display = "none";
+    }
+
+    function showRewards() {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "block";
+    }
+
+    function logout() {
+      // Make sure you have firebase initialized in app.js
+      firebase.auth().signOut().then(() => {
+        location.reload();
+      });
+    }
+  </script>
+  
 </body>
 </html>
