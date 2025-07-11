@@ -3,45 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rewards Site</title>
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css" />
+  <title>BloxVault Dashboard</title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom Style -->
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background-color: #ff6600;
+    }
+    .navbar-brand,
+    .nav-link {
+      color: #fff !important;
+    }
+    .card {
+      background-color: #1c1c1c;
+      border: none;
+      color: #fff;
+    }
+    .btn-primary {
+      background-color: #ff6600;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #e65c00;
+    }
+    .logo {
+      max-width: 150px;
+    }
+  </style>
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <div class="card shadow p-4">
-      <!-- Login/Register Section -->
-      <div id="auth">
-        <h2 class="text-center mb-4">Login / Register</h2>
-        <input type="email" id="email" class="form-control mb-3" placeholder="Email" />
-        <input type="password" id="password" class="form-control mb-3" placeholder="Password" />
-        <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-        <button onclick="register()" class="btn btn-secondary w-100">Register</button>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="https://via.placeholder.com/150x40?text=Your+Logo" class="logo" alt="Logo" />
+      </a>
+      <div class="d-flex ms-auto">
+        <a class="nav-link" href="#">Home</a>
+        <a class="nav-link" href="#">Rewards</a>
+        <a class="nav-link" href="#" onclick="logout()">Logout</a>
       </div>
+    </div>
+  </nav>
 
-      <!-- Dashboard Section -->
-      <div id="dashboard" style="display:none;">
-        <h2 class="text-center">Welcome, <span id="userEmail"></span></h2>
-        <p class="text-center">Points: <span id="points">0</span></p>
+  <!-- Main Content -->
+  <div class="container py-5">
+    <div class="card p-4 shadow">
+      <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
+      <p class="text-center">Points: <span id="points">0</span></p>
 
-        <h4 class="mt-4">Request a Reward</h4>
-        <select id="rewardType" class="form-select mb-3">
-          <option>Amazon Gift Card</option>
-          <option>Steam Code</option>
+      <hr />
+
+      <!-- Reward Request -->
+      <h4 class="mb-3">Request a Reward</h4>
+      <div class="mb-3">
+        <label for="rewardType" class="form-label">Choose a Reward</label>
+        <select id="rewardType" class="form-select">
           <option>Robux</option>
+          <option>Crypto</option>
         </select>
-        <input type="text" id="rewardDetails" class="form-control mb-3" placeholder="Enter email or username" />
-        <button onclick="requestReward()" class="btn btn-success w-100 mb-2">Submit Request</button>
-        <button onclick="logout()" class="btn btn-danger w-100">Logout</button>
+      </div>
+      <div class="mb-3">
+        <input type="text" id="rewardDetails" class="form-control" placeholder="Enter your username or wallet address" />
+      </div>
+      <button onclick="requestReward()" class="btn btn-primary w-100 mb-4">Submit Reward Request</button>
+
+      <!-- Offerwall Placeholder -->
+      <h5 class="mt-4 mb-2">Earn More Points</h5>
+      <div style="background: #2a2a2a; padding: 20px; text-align: center;">
+        <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
       </div>
     </div>
   </div>
 
-  <!-- App Logic -->
+  <!-- Firebase App Logic -->
   <script type="module" src="app.js"></script>
+
 </body>
 </html>
