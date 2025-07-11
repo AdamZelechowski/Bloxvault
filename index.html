@@ -1,27 +1,47 @@
-<body>
-  <div class="container">
-    <div id="auth">
-      <h2>Login / Register</h2>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button onclick="login()">Login</button>
-      <button onclick="register()">Register</button>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rewards Site</title>
 
-    <div id="dashboard" style="display:none;">
-      <h2>Welcome, <span id="userEmail"></span></h2>
-      <p>Points: <span id="points">0</span></p>
-      <h3>Request a Reward</h3>
-      <select id="rewardType">
-        <option>Amazon Gift Card</option>
-        <option>Steam Code</option>
-        <option>Robux</option>
-      </select>
-      <input type="text" id="rewardDetails" placeholder="Enter email or username" />
-      <button onclick="requestReward()">Submit Request</button>
-      <button onclick="logout()">Logout</button>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="card shadow p-4">
+      <!-- Login/Register Section -->
+      <div id="auth">
+        <h2 class="text-center mb-4">Login / Register</h2>
+        <input type="email" id="email" class="form-control mb-3" placeholder="Email" />
+        <input type="password" id="password" class="form-control mb-3" placeholder="Password" />
+        <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+        <button onclick="register()" class="btn btn-secondary w-100">Register</button>
+      </div>
+
+      <!-- Dashboard Section -->
+      <div id="dashboard" style="display:none;">
+        <h2 class="text-center">Welcome, <span id="userEmail"></span></h2>
+        <p class="text-center">Points: <span id="points">0</span></p>
+
+        <h4 class="mt-4">Request a Reward</h4>
+        <select id="rewardType" class="form-select mb-3">
+          <option>Amazon Gift Card</option>
+          <option>Steam Code</option>
+          <option>Robux</option>
+        </select>
+        <input type="text" id="rewardDetails" class="form-control mb-3" placeholder="Enter email or username" />
+        <button onclick="requestReward()" class="btn btn-success w-100 mb-2">Submit Request</button>
+        <button onclick="logout()" class="btn btn-danger w-100">Logout</button>
+      </div>
     </div>
   </div>
 
+  <!-- App Logic -->
   <script type="module" src="app.js"></script>
 </body>
+</html>
