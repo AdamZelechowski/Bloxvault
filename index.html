@@ -6,9 +6,8 @@
   <title>BloxVault Dashboard</title>
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-  <!-- Custom Style -->
   <style>
     body {
       background-color: #111;
@@ -19,7 +18,7 @@
       background-color: #ff6600;
     }
     .navbar-brand,
-    .nav-link, 
+    .nav-link,
     .btn-link {
       color: #fff !important;
     }
@@ -56,40 +55,53 @@
     </div>
   </nav>
 
-  <!-- Main Content -->
   <div class="container py-5">
 
-    <div id="dashboard" class="card p-4 shadow">
-      <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
-      <p class="text-center">Points: <span id="points">0</span></p>
-
-      <hr />
-
-      <!-- Reward Request -->
-      <h4 class="mb-3">Request a Reward</h4>
-      <div class="mb-3">
-        <label for="rewardType" class="form-label">Choose a Reward</label>
-        <select id="rewardType" class="form-select">
-          <option>Robux</option>
-          <option>Crypto</option>
-        </select>
-      </div>
-      <div class="mb-3">
-        <input type="text" id="rewardDetails" class="form-control" placeholder="Enter your username or wallet address" />
-      </div>
-      <button onclick="requestReward()" class="btn btn-primary w-100 mb-4">Submit Reward Request</button>
-
-      <!-- Offerwall Placeholder -->
-      <h5 class="mt-4 mb-2">Earn More Points</h5>
-      <div style="background: #2a2a2a; padding: 20px; text-align: center;">
-        <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
-      </div>
+    <!-- AUTH AREA (Login/Register) -->
+    <div id="auth" class="card p-4 shadow mx-auto" style="max-width: 400px;">
+      <h2 class="text-center mb-4">Login or Register</h2>
+      <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
+      <input id="password" type="password" class="form-control mb-3" placeholder="Password" />
+      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+      <button onclick="register()" class="btn btn-secondary w-100">Register</button>
     </div>
 
-    <div id="rewards" style="display:none;" class="card p-4 shadow mt-4">
-      <h2 class="text-center mb-3">Rewards</h2>
-      <p class="text-center">Here’s where you can explore future rewards or bonus offers.</p>
-      <div class="text-center">🚧 Work in progress...</div>
+    <!-- DASHBOARD AREA -->
+    <div id="dashboard" style="display:none;">
+
+      <div class="card p-4 shadow">
+        <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
+        <p class="text-center">Points: <span id="points">0</span></p>
+
+        <hr />
+
+        <!-- Reward Request -->
+        <h4 class="mb-3">Request a Reward</h4>
+        <div class="mb-3">
+          <label for="rewardType" class="form-label">Choose a Reward</label>
+          <select id="rewardType" class="form-select">
+            <option>Robux</option>
+            <option>Crypto</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <input type="text" id="rewardDetails" class="form-control" placeholder="Enter your username or wallet address" />
+        </div>
+        <button onclick="requestReward()" class="btn btn-primary w-100 mb-4">Submit Reward Request</button>
+
+        <!-- Offerwall Placeholder -->
+        <h5 class="mt-4 mb-2">Earn More Points</h5>
+        <div style="background: #2a2a2a; padding: 20px; text-align: center;">
+          <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
+        </div>
+      </div>
+
+      <div id="rewards" style="display:none;" class="card p-4 shadow mt-4">
+        <h2 class="text-center mb-3">Rewards</h2>
+        <p class="text-center">Here’s where you can explore future rewards or bonus offers.</p>
+        <div class="text-center">🚧 Work in progress...</div>
+      </div>
+
     </div>
 
   </div>
@@ -110,12 +122,9 @@
     }
 
     function logout() {
-      // Make sure you have firebase initialized in app.js
-      firebase.auth().signOut().then(() => {
-        location.reload();
-      });
+      // This will be overridden by app.js logout function.
+      console.log("Logging out...");
     }
   </script>
-  
 </body>
 </html>
