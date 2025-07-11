@@ -1,177 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BloxVault Dashboard</title>
+<!-- Firebase SDKs (example only if not already included in app.js) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
+    authDomain: "bloxvault-d1ff0.firebaseapp.com",
+    projectId: "bloxvault-d1ff0",
+    storageBucket: "bloxvault-d1ff0.appspot.com",
+    messagingSenderId: "365008891027",
+    appId: "1:365008891027:web:3578577b3c33714f207166",
+    measurementId: "G-M3D3KVD5H5"
+  };
 
-  <style>
-    body {
-      background-color: #000;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-    }
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    .navbar {
-      background-color: #ff7700;
-    }
-
-    .navbar-brand,
-    .nav-link,
-    .btn-link {
-      color: #fff !important;
-      font-weight: 600;
-    }
-
-    .nav-link:hover,
-    .btn-link:hover {
-      color: #ffe6cc !important;
-    }
-
-    .card {
-      background-color: #111;
-      border-radius: 8px;
-      border: 1px solid #ff7700;
-      color: #fff;
-    }
-
-    .btn-primary {
-      background-color: #ff7700;
-      border: none;
-      font-weight: 600;
-    }
-
-    .btn-primary:hover,
-    .btn-primary:focus {
-      background-color: #ff9933;
-    }
-
-    .logo {
-      max-width: 150px;
-    }
-
-    input.form-control,
-    select.form-select {
-      background-color: #1a1a1a;
-      border: 1px solid #ff7700;
-      color: #fff;
-    }
-
-    input.form-control:focus,
-    select.form-select:focus {
-      border-color: #ff9933;
-      background-color: #222;
-      color: #fff;
-    }
-
-    h2, h4, h5 {
-      color: #ff7700;
-    }
-
-    #dashboard,
-    #rewards,
-    #navButtons {
-      display: none;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">
-        <img src="https://via.placeholder.com/150x40?text=Your+Logo" class="logo" alt="Logo" />
-      </a>
-      <div class="d-flex ms-auto gap-3" id="navButtons">
-        <button class="btn btn-link nav-link" onclick="showDashboard()">Home</button>
-        <button class="btn btn-link nav-link" onclick="showRewards()">Rewards</button>
-        <button class="btn btn-link nav-link" onclick="logout()">Logout</button>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container py-5">
-
-    <!-- AUTH AREA -->
-    <div id="auth" class="card p-4 shadow mx-auto" style="max-width: 400px;">
-      <h2 class="text-center mb-4">Login or Register</h2>
-      <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
-      <input id="password" type="password" class="form-control mb-3" placeholder="Password" />
-      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-      <button onclick="register()" class="btn btn-secondary w-100">Register</button>
-    </div>
-
-    <!-- DASHBOARD AREA -->
-    <div id="dashboard">
-      <div class="card p-4 shadow mb-4">
-        <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
-        <p class="text-center">Points: <span id="points">0</span></p>
-      </div>
-
-      <div class="card p-4 shadow">
-        <h5 class="mb-3">Earn Points</h5>
-        <div style="background: #000; padding: 20px; text-align: center; border: 1px dashed #ff7700;">
-          <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- REWARDS AREA -->
-    <div id="rewards">
-      <div class="card p-4 shadow">
-        <h2 class="text-center mb-4">Request a Reward</h2>
-
-        <div class="mb-3">
-          <label for="rewardType" class="form-label">Choose a Reward</label>
-          <select id="rewardType" class="form-select">
-            <option>Robux</option>
-            <option>Crypto</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <input
-            type="text"
-            id="rewardDetails"
-            class="form-control"
-            placeholder="Enter your username or wallet address"
-          />
-        </div>
-        <button onclick="requestReward()" class="btn btn-primary w-100 mb-4">Submit Reward Request</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Firebase App Logic -->
-  <script type="module" src="app.js"></script>
-
-  <!-- Navigation + State Visibility -->
-  <script>
-    function showDashboard() {
+  // Show correct UI based on login
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      document.getElementById("auth").style.display = "none";
+      document.getElementById("navButtons").style.display = "flex";
       document.getElementById("dashboard").style.display = "block";
-      document.getElementById("rewards").style.display = "none";
-    }
-
-    function showRewards() {
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("rewards").style.display = "block";
-    }
-
-    function logout() {
-      // Handled in app.js
-    }
-
-    // 👇 Ensure visibility is clean and hidden on load
-    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("userEmail").textContent = user.email;
+    } else {
+      document.getElementById("auth").style.display = "block";
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("rewards").style.display = "none";
       document.getElementById("navButtons").style.display = "none";
-      document.getElementById("auth").style.display = "block";
-    });
-  </script>
-</body>
-</html>
+    }
+  });
+
+  window.login = () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    signInWithEmailAndPassword(auth, email, password)
+      .catch((error) => alert(error.message));
+  };
+
+  window.register = () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    createUserWithEmailAndPassword(auth, email, password)
+      .catch((error) => alert(error.message));
+  };
+
+  window.logout = () => {
+    signOut(auth);
+  };
+
+  window.showDashboard = () => {
+    document.getElementById("dashboard").style.display = "block";
+    document.getElementById("rewards").style.display = "none";
+  };
+
+  window.showRewards = () => {
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("rewards").style.display = "block";
+  };
+
+  window.requestReward = () => {
+    const type = document.getElementById("rewardType").value;
+    const details = document.getElementById("rewardDetails").value;
+    alert(`Requested ${type} reward for: ${details}`);
+  };
+</script>
