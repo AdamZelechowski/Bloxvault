@@ -12,13 +12,12 @@
   <style>
     body {
       display: none;
-      background-color: #2c2c2c;
-      color: #fff;
+      background-color: #ff7700; /* Bright Orange */
       font-family: 'Segoe UI', sans-serif;
     }
 
     .navbar {
-      background-color: #ff7700;
+      background-color: #2c2c2c;
       display: none;
     }
 
@@ -28,38 +27,39 @@
     }
 
     .info-box {
-      background-color: #ff9900;
+      background-color: #fff;
       border-radius: 10px;
       padding: 20px;
-      color: #2c2c2c;
+      color: #333;
     }
 
     .card {
-      background-color: #3a3a3a;
-      border: 2px solid #ff7700;
+      background-color: #2c2c2c;
+      border: 2px solid #fff;
       border-radius: 10px;
       color: #fff;
     }
 
     .btn-primary {
-      background-color: #ff7700;
-      border: none;
+      background-color: #fff;
+      color: #ff7700;
       font-weight: bold;
+      border: none;
     }
 
     .btn-primary:hover {
-      background-color: #ff9900;
+      background-color: #f2f2f2;
     }
 
     input.form-control,
     select.form-select {
-      background-color: #4a4a4a;
+      background-color: #3a3a3a;
       color: #fff;
-      border: 2px solid #ff7700;
+      border: 2px solid #fff;
     }
 
     h1, h2, h4, h5 {
-      color: #ff7700;
+      color: #fff;
     }
 
     #dashboard, #rewards {
@@ -92,29 +92,27 @@
     <!-- AUTH -->
     <div id="auth">
       <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
-        
+
         <!-- Info Panel -->
         <div class="info-box" style="max-width: 450px;">
           <h2>Welcome to BloxVault!</h2>
-          <p><strong>BloxVault</strong> is a free rewards platform where you can earn points by completing surveys and offers. Redeem your points for <span style="font-weight:bold;">Robux, crypto, and more.</span></p>
-          
+          <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
           <h5>How It Works:</h5>
           <ul>
-            <li>✅ Sign up for free</li>
-            <li>✅ Complete simple tasks & surveys</li>
+            <li>✅ Sign up free</li>
+            <li>✅ Complete tasks & surveys</li>
             <li>✅ Earn points instantly</li>
             <li>✅ Redeem for real rewards</li>
           </ul>
-
-          <h5>Why Trust BloxVault?</h5>
+          <h5>Why Trust Us?</h5>
           <ul>
-            <li>🔐 Secure & private — we never sell your data</li>
-            <li>🎯 Fast payouts (usually within 24 hrs)</li>
+            <li>🔐 Secure — no data selling</li>
+            <li>🎯 Fast payouts (usually 24 hrs)</li>
             <li>📈 Growing community of real users</li>
           </ul>
         </div>
 
-        <!-- Login/Register Panel -->
+        <!-- Login/Register -->
         <div class="card p-4" style="max-width: 400px; width: 100%;">
           <h2 class="text-center mb-4">Login or Register</h2>
           <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
@@ -156,7 +154,7 @@
 
   </div>
 
-  <!-- Firebase + Auth Logic -->
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -198,7 +196,7 @@
         rewards.style.display = "none";
       }
 
-      // Reveal content only after Firebase confirms auth
+      // Only show site after Firebase confirms state
       document.body.style.display = "block";
     });
 
