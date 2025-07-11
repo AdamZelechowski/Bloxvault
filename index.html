@@ -5,17 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BloxVault</title>
 
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Prevent UI flash before auth state is known -->
   <style>
     body {
-      background-color: #2c2c2c; /* Dark Gray */
+      display: none;
+      background-color: #2c2c2c; /* Dark gray */
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
     }
 
     .navbar {
       background-color: #ff7700;
-      display: none; /* hidden on login */
+      display: none; /* Hidden by default */
     }
 
     .navbar-brand,
@@ -74,7 +78,7 @@
 
   <div class="container py-5">
 
-    <!-- AUTH AREA -->
+    <!-- Login / Register -->
     <div id="auth" class="card p-4 mx-auto" style="max-width: 400px;">
       <h2 class="text-center mb-4">Login or Register</h2>
       <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
@@ -83,7 +87,7 @@
       <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- Dashboard -->
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
@@ -96,7 +100,7 @@
       </div>
     </div>
 
-    <!-- REWARDS -->
+    <!-- Rewards -->
     <div id="rewards">
       <div class="card p-4">
         <h2 class="text-center mb-4">Request a Reward</h2>
@@ -155,18 +159,23 @@
         dash.style.display = "none";
         rewards.style.display = "none";
       }
+
+      // ✅ Show site only after auth state is confirmed
+      document.body.style.display = "block";
     });
 
     window.login = () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
     window.register = () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      createUserWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
     window.logout = () => signOut(auth);
