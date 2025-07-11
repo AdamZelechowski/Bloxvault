@@ -68,15 +68,17 @@
 
     <!-- DASHBOARD AREA -->
     <div id="dashboard" style="display:none;">
-
       <div class="card p-4 shadow">
         <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
         <p class="text-center">Points: <span id="points">0</span></p>
+      </div>
+    </div>
 
-        <hr />
+    <!-- REWARDS AREA -->
+    <div id="rewards" style="display:none;">
+      <div class="card p-4 shadow">
+        <h2 class="text-center mb-4">Request a Reward</h2>
 
-        <!-- Reward Request -->
-        <h4 class="mb-3">Request a Reward</h4>
         <div class="mb-3">
           <label for="rewardType" class="form-label">Choose a Reward</label>
           <select id="rewardType" class="form-select">
@@ -85,23 +87,20 @@
           </select>
         </div>
         <div class="mb-3">
-          <input type="text" id="rewardDetails" class="form-control" placeholder="Enter your username or wallet address" />
+          <input
+            type="text"
+            id="rewardDetails"
+            class="form-control"
+            placeholder="Enter your username or wallet address"
+          />
         </div>
         <button onclick="requestReward()" class="btn btn-primary w-100 mb-4">Submit Reward Request</button>
 
-        <!-- Offerwall Placeholder -->
         <h5 class="mt-4 mb-2">Earn More Points</h5>
         <div style="background: #2a2a2a; padding: 20px; text-align: center;">
           <p>Offerwall will go here. You can embed surveys, tasks, or games here to earn crypto.</p>
         </div>
       </div>
-
-      <div id="rewards" style="display:none;" class="card p-4 shadow mt-4">
-        <h2 class="text-center mb-3">Rewards</h2>
-        <p class="text-center">Here’s where you can explore future rewards or bonus offers.</p>
-        <div class="text-center">🚧 Work in progress...</div>
-      </div>
-
     </div>
 
   </div>
@@ -122,7 +121,7 @@
     }
 
     function logout() {
-      // This will be overridden by app.js logout function.
+      // Overridden by app.js logout
       console.log("Logging out...");
     }
   </script>
