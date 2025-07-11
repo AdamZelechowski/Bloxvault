@@ -1,33 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>RewardStack</title>
-  <meta charset="UTF-8" />
-  <link rel="stylesheet" href="style.css" />
-</head>
 <body>
-  <div id="auth">
-    <h2>Login / Register</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <button onclick="register()">Register</button>
-  </div>
+  <div class="container">
+    <div id="auth">
+      <h2>Login / Register</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <button onclick="register()">Register</button>
+    </div>
 
-  <div id="dashboard" style="display:none;">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p>Points: <span id="points">0</span></p>
-    <h3>Request a Reward</h3>
-    <select id="rewardType">
-      <option>Amazon Gift Card</option>
-      <option>Steam Code</option>
-      <option>Robux</option>
-    </select>
-    <input type="text" id="rewardDetails" placeholder="Enter email or username" />
-    <button onclick="requestReward()">Submit Request</button>
-    <button onclick="logout()">Logout</button>
+    <div id="dashboard" style="display:none;">
+      <h2>Welcome, <span id="userEmail"></span></h2>
+      <p>Points: <span id="points">0</span></p>
+      <h3>Request a Reward</h3>
+      <select id="rewardType">
+        <option>Amazon Gift Card</option>
+        <option>Steam Code</option>
+        <option>Robux</option>
+      </select>
+      <input type="text" id="rewardDetails" placeholder="Enter email or username" />
+      <button onclick="requestReward()">Submit Request</button>
+      <button onclick="logout()">Logout</button>
+    </div>
   </div>
 
   <script type="module" src="app.js"></script>
 </body>
-</html>
