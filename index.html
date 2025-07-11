@@ -70,6 +70,12 @@
     h2, h4, h5 {
       color: #ff7700;
     }
+
+    #dashboard,
+    #rewards,
+    #navButtons {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -80,7 +86,7 @@
       <a class="navbar-brand" href="#">
         <img src="https://via.placeholder.com/150x40?text=Your+Logo" class="logo" alt="Logo" />
       </a>
-      <div class="d-flex ms-auto gap-3" id="navButtons" style="display: none;">
+      <div class="d-flex ms-auto gap-3" id="navButtons">
         <button class="btn btn-link nav-link" onclick="showDashboard()">Home</button>
         <button class="btn btn-link nav-link" onclick="showRewards()">Rewards</button>
         <button class="btn btn-link nav-link" onclick="logout()">Logout</button>
@@ -100,7 +106,7 @@
     </div>
 
     <!-- DASHBOARD AREA -->
-    <div id="dashboard" style="display: none;">
+    <div id="dashboard">
       <div class="card p-4 shadow mb-4">
         <h2 class="text-center mb-4">Welcome, <span id="userEmail">User</span></h2>
         <p class="text-center">Points: <span id="points">0</span></p>
@@ -115,7 +121,7 @@
     </div>
 
     <!-- REWARDS AREA -->
-    <div id="rewards" style="display: none;">
+    <div id="rewards">
       <div class="card p-4 shadow">
         <h2 class="text-center mb-4">Request a Reward</h2>
 
@@ -143,7 +149,7 @@
   <!-- Firebase App Logic -->
   <script type="module" src="app.js"></script>
 
-  <!-- Navigation Script -->
+  <!-- Navigation + State Visibility -->
   <script>
     function showDashboard() {
       document.getElementById("dashboard").style.display = "block";
@@ -156,9 +162,16 @@
     }
 
     function logout() {
-      // Overridden in app.js
-      console.log("Logging out...");
+      // Handled in app.js
     }
+
+    // 👇 Ensure visibility is clean and hidden on load
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "none";
+      document.getElementById("navButtons").style.display = "none";
+      document.getElementById("auth").style.display = "block";
+    });
   </script>
 </body>
 </html>
