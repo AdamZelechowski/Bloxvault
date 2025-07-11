@@ -5,28 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BloxVault</title>
 
-  <!-- Bootstrap CSS -->
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-  <!-- Prevent UI flash before auth state is known -->
+  <!-- Style -->
   <style>
     body {
       display: none;
-      background-color: #2c2c2c; /* Dark gray */
+      background-color: #2c2c2c;
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
     }
 
     .navbar {
       background-color: #ff7700;
-      display: none; /* Hidden by default */
+      display: none;
     }
 
-    .navbar-brand,
-    .nav-link,
-    .btn-link {
+    .navbar-brand, .nav-link, .btn-link {
       color: #fff !important;
       font-weight: bold;
+    }
+
+    .info-box {
+      background-color: #ff9900;
+      border-radius: 10px;
+      padding: 20px;
+      color: #2c2c2c;
     }
 
     .card {
@@ -53,12 +58,18 @@
       border: 2px solid #ff7700;
     }
 
-    h2, h4, h5 {
+    h1, h2, h4, h5 {
       color: #ff7700;
     }
 
     #dashboard, #rewards {
       display: none;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -78,13 +89,40 @@
 
   <div class="container py-5">
 
-    <!-- Login / Register -->
-    <div id="auth" class="card p-4 mx-auto" style="max-width: 400px;">
-      <h2 class="text-center mb-4">Login or Register</h2>
-      <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
-      <input id="password" type="password" class="form-control mb-3" placeholder="Password" />
-      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-      <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
+    <!-- AUTH -->
+    <div id="auth">
+      <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+        
+        <!-- Info Panel -->
+        <div class="info-box" style="max-width: 450px;">
+          <h2>Welcome to BloxVault!</h2>
+          <p><strong>BloxVault</strong> is a free rewards platform where you can earn points by completing surveys and offers. Redeem your points for <span style="font-weight:bold;">Robux, crypto, and more.</span></p>
+          
+          <h5>How It Works:</h5>
+          <ul>
+            <li>✅ Sign up for free</li>
+            <li>✅ Complete simple tasks & surveys</li>
+            <li>✅ Earn points instantly</li>
+            <li>✅ Redeem for real rewards</li>
+          </ul>
+
+          <h5>Why Trust BloxVault?</h5>
+          <ul>
+            <li>🔐 Secure & private — we never sell your data</li>
+            <li>🎯 Fast payouts (usually within 24 hrs)</li>
+            <li>📈 Growing community of real users</li>
+          </ul>
+        </div>
+
+        <!-- Login/Register Panel -->
+        <div class="card p-4" style="max-width: 400px; width: 100%;">
+          <h2 class="text-center mb-4">Login or Register</h2>
+          <input id="email" type="email" class="form-control mb-3" placeholder="Email" />
+          <input id="password" type="password" class="form-control mb-3" placeholder="Password" />
+          <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+          <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
+        </div>
+      </div>
     </div>
 
     <!-- Dashboard -->
@@ -118,7 +156,7 @@
 
   </div>
 
-  <!-- Firebase + Logic -->
+  <!-- Firebase + Auth Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -160,7 +198,7 @@
         rewards.style.display = "none";
       }
 
-      // ✅ Show site only after auth state is confirmed
+      // Reveal content only after Firebase confirms auth
       document.body.style.display = "block";
     });
 
