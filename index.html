@@ -18,7 +18,6 @@
 
     .navbar {
       background-color: #2c2c2c;
-      display: none;
     }
 
     .navbar-brand {
@@ -35,14 +34,6 @@
 
     .nav-link, .btn-link {
       color: #fff !important;
-      font-weight: bold;
-    }
-
-    .dropdown-menu {
-      background-color: #ffffcc;
-    }
-
-    .dropdown-item {
       font-weight: bold;
     }
 
@@ -82,7 +73,7 @@
       color: #fff;
     }
 
-    #dashboard, #rewards, #adminPanel {
+    #dashboard, #rewards {
       display: none;
     }
 
@@ -101,16 +92,37 @@
       padding-left: 36px;
     }
 
-    @media (max-width: 768px) {
-      .auth-container {
-        flex-direction: column;
-      }
+    @keyframes rgbChroma {
+      0% { background-color: #ff0000; }
+      25% { background-color: #00ff00; }
+      50% { background-color: #0000ff; }
+      75% { background-color: #ffff00; }
+      100% { background-color: #ff0000; }
+    }
+
+    .rgb-chroma {
+      animation: rgbChroma 4s linear infinite;
+      color: white !important;
+      font-weight: bold;
+      border: none;
+    }
+
+    .dropdown-menu {
+      background-color: #222;
+      border: 1px solid #fff;
+    }
+
+    .dropdown-item {
+      color: #fff;
+    }
+
+    .dropdown-item:hover {
+      background-color: #ff7700;
+      color: #000;
     }
   </style>
 </head>
 <body>
-
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
@@ -119,92 +131,21 @@
     <div class="d-flex ms-auto gap-3" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
-
-      <!-- Admin Dropdown -->
-      <div class="dropdown" id="adminDropdown" style="display: none;">
-        <button class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown">
+      <div class="dropdown" id="adminPanelDropdown" style="display: none;">
+        <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown">
           Admin Panel
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#" onclick="adminViewUsers()">View Users</a></li>
-          <li><a class="dropdown-item" href="#" onclick="adminViewRewards()">View Reward Requests</a></li>
-          <li><a class="dropdown-item" href="#" onclick="adminDiagnostics()">Run Diagnostics</a></li>
+          <li><a class="dropdown-item" href="#" onclick="viewUsers()">View Users</a></li>
+          <li><a class="dropdown-item" href="#" onclick="viewRewardRequests()">Reward Requests</a></li>
+          <li><a class="dropdown-item" href="#" onclick="runDiagnostics()">Run Diagnostics</a></li>
           <li><a class="dropdown-item" href="#" onclick="adminLookupUser()">User Lookup</a></li>
         </ul>
       </div>
-
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
 
-  <div class="container py-5">
-
-    <!-- AUTH -->
-    <div id="auth">
-      <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
-        <div class="info-box" style="max-width: 450px;">
-          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;" />
-          <h2>Welcome to BloxVault!</h2>
-          <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
-          <h5>How It Works:</h5>
-          <ul>
-            <li>✅ Sign up free</li>
-            <li>✅ Complete tasks & surveys</li>
-            <li>✅ Earn points instantly</li>
-            <li>✅ Redeem for real rewards</li>
-          </ul>
-          <h5>Why Trust Us?</h5>
-          <ul>
-            <li>🔐 Secure — no data selling</li>
-            <li>🎯 Fast payouts (usually 24 hrs)</li>
-            <li>📈 Growing community of real users</li>
-          </ul>
-        </div>
-
-        <!-- Login/Register -->
-        <div class="card p-4" style="max-width: 400px; width: 100%;">
-          <h2 class="text-center mb-4">Login or Register</h2>
-          <div class="input-group mb-3">
-            <i class="bi bi-envelope-fill form-icon"></i>
-            <input id="email" type="email" class="form-control" placeholder="Email" />
-          </div>
-          <div class="input-group mb-3">
-            <i class="bi bi-lock-fill form-icon"></i>
-            <input id="password" type="password" class="form-control" placeholder="Password" />
-          </div>
-          <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-          <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dashboard -->
-    <div id="dashboard">
-      <div class="card p-4 mb-4">
-        <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
-        <p class="text-center">Points: <span id="points">0</span></p>
-      </div>
-    </div>
-
-    <!-- Rewards -->
-    <div id="rewards">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">Request a Reward</h2>
-        <div class="mb-3">
-          <label for="rewardType" class="form-label">Choose a Reward</label>
-          <select id="rewardType" class="form-select">
-            <option>Robux</option>
-            <option>Crypto</option>
-          </select>
-        </div>
-        <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" />
-        <button onclick="requestReward()" class="btn btn-primary w-100">Submit</button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -214,11 +155,6 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -231,29 +167,27 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
-    const adminEmail = "zelechowskiadam3@gmail.com";
-
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       const authUI = document.getElementById("auth");
       const navbar = document.getElementById("topNavbar");
       const dash = document.getElementById("dashboard");
       const rewards = document.getElementById("rewards");
-      const adminDropdown = document.getElementById("adminDropdown");
-      const emailSpan = document.getElementById("userEmail");
+      const adminPanel = document.getElementById("adminPanelDropdown");
 
       if (user) {
-        authUI.style.display = "none";
+        authUI?.style?.display = "none";
         navbar.style.display = "flex";
         dash.style.display = "block";
-        emailSpan.textContent = user.email;
+        rewards.style.display = "none";
 
-        if (user.email === adminEmail) {
-          adminDropdown.style.display = "block";
+        if (user.email === "zelechowskiadam3@gmail.com") {
+          adminPanel.style.display = "block";
+        } else {
+          adminPanel.style.display = "none";
         }
       } else {
-        authUI.style.display = "block";
+        authUI?.style?.display = "block";
         navbar.style.display = "none";
         dash.style.display = "none";
         rewards.style.display = "none";
@@ -262,61 +196,23 @@
       document.body.style.display = "block";
     });
 
-    window.login = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
-    };
-
-    window.register = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
-    };
-
     window.logout = () => signOut(auth);
-
     window.showDashboard = () => {
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("rewards").style.display = "none";
     };
-
     window.showRewards = () => {
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("rewards").style.display = "block";
     };
 
-    window.requestReward = () => {
-      const type = document.getElementById("rewardType").value;
-      const details = document.getElementById("rewardDetails").value;
-      alert(`Requested ${type} reward for ${details}`);
-    };
-
-    // === Admin Functions ===
-    window.adminViewUsers = () => alert("View Users coming soon!");
-    window.adminViewRewards = () => alert("View Reward Requests coming soon!");
-    window.adminDiagnostics = () => alert("Diagnostics check passed.");
-    window.adminLookupUser = async () => {
-      const email = prompt("Enter user's email to look up:");
-      if (!email) return;
-
-      try {
-        const usersCol = collection(db, "users");
-        const querySnapshot = await getDocs(usersCol);
-        let found = false;
-
-        querySnapshot.forEach(docSnap => {
-          const data = docSnap.data();
-          if (data.email === email) {
-            alert(`User Found:\nUID: ${docSnap.id}\nPoints: ${data.points || 0}`);
-            found = true;
-          }
-        });
-
-        if (!found) alert("No user found with that email.");
-      } catch (err) {
-        alert("Error fetching user: " + err.message);
-      }
+    // Admin actions
+    window.viewUsers = () => alert("This would fetch and display users.");
+    window.viewRewardRequests = () => alert("This would show pending reward requests.");
+    window.runDiagnostics = () => alert("Running diagnostics... done!");
+    window.adminLookupUser = () => {
+      const email = prompt("Enter user email to lookup:");
+      if (email) alert("Looking up: " + email);
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
