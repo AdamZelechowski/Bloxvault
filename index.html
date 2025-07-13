@@ -18,7 +18,7 @@
 
     .navbar {
       background-color: #2c2c2c;
-      display: none;
+      display: none; /* Hide by default, show on login */
     }
 
     .navbar-brand {
@@ -74,7 +74,7 @@
       color: #fff;
     }
 
-    #dashboard, #rewards, #adminPanel {
+    #dashboard, #rewards {
       display: none;
     }
 
@@ -114,9 +114,6 @@
     <div class="d-flex ms-auto gap-3" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
-      <button id="adminTab" class="btn btn-link nav-link" onclick="showAdminPanel()" style="display:none;">
-        <i class="bi bi-shield-lock-fill"></i> Admin
-      </button>
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
@@ -200,15 +197,6 @@
       </div>
     </div>
 
-    <!-- Admin Panel -->
-    <div id="adminPanel">
-      <div class="card p-4 mb-4">
-        <h2>Admin Panel — Reward Requests</h2>
-        <div id="diagnostics" class="mb-4">Loading diagnostics...</div>
-        <div id="rewardRequestsList">Loading reward requests...</div>
-      </div>
-    </div>
-
   </div>
 
   <!-- Firebase + Logic -->
@@ -221,17 +209,6 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      getDocs,
-      setDoc,
-      addDoc,
-      updateDoc,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -244,74 +221,39 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const userEmailSpan = document.getElementById("userEmail");
-    const pointsSpan = document.getElementById("points");
-    const rewardTypeSelect = document.getElementById("rewardType");
-    const rewardDetailsInput = document.getElementById("rewardDetails");
-    const authDiv = document.getElementById("auth");
-    const dashboardDiv = document.getElementById("dashboard");
-    const rewardsDiv = document.getElementById("rewards");
-    const adminPanelDiv = document.getElementById("adminPanel");
-    const adminTabBtn = document.getElementById("adminTab");
+    onAuthStateChanged(auth, (user) => {
+      const authUI = document.getElementById("auth");
+      const navbar = document.getElementById("topNavbar");
+      const dash = document.getElementById("dashboard");
+      const rewards = document.getElementById("rewards");
 
-    const adminEmail = "zelechowskiadam3@email.com"; // <-- Replace with your admin email here
-
-    // Monitor auth state and toggle UI
-    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        authDiv.style.display = "none";
-        dashboardDiv.style.display = "block";
-        rewardsDiv.style.display = "none";
-        adminPanelDiv.style.display = "none";
-        userEmailSpan.textContent = user.email;
-
-        // Show admin tab only if admin user
-        if (user.email === adminEmail) {
-          adminTabBtn.style.display = "inline-block";
-        } else {
-          adminTabBtn.style.display = "none";
-        }
-
-        // Fetch or create user points (simplified)
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDocs(query(collection(db, "users"), orderBy("uid")));
-        const userSnapshot = await doc(db, "users", user.uid).get();
-
-        const userSnap = await userDocRef.get?.() ?? null;
-        const userSnapExists = userDocSnap.exists?.() ?? false;
-
-        if (userSnapExists) {
-          const data = userDocSnap.data();
-          pointsSpan.textContent = data?.points || 0;
-        } else {
-          await setDoc(userDocRef, { points: 0 });
-          pointsSpan.textContent = "0";
-        }
-
+        authUI.style.display = "none";
+        navbar.style.display = "flex";       // <== SHOW NAVBAR on login
+        dash.style.display = "block";
+        rewards.style.display = "none";
+        document.getElementById("userEmail").textContent = user.email;
       } else {
-        authDiv.style.display = "block";
-        dashboardDiv.style.display = "none";
-        rewardsDiv.style.display = "none";
-        adminPanelDiv.style.display = "none";
-        adminTabBtn.style.display = "none";
+        authUI.style.display = "block";
+        navbar.style.display = "none";       // <== HIDE NAVBAR on logout
+        dash.style.display = "none";
+        rewards.style.display = "none";
       }
+
       document.body.style.display = "block";
     });
 
     window.login = () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       signInWithEmailAndPassword(auth, email, password)
         .catch(err => alert(err.message));
     };
 
     window.register = () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
       createUserWithEmailAndPassword(auth, email, password)
         .catch(err => alert(err.message));
     };
@@ -319,129 +261,19 @@
     window.logout = () => signOut(auth);
 
     window.showDashboard = () => {
-      dashboardDiv.style.display = "block";
-      rewardsDiv.style.display = "none";
-      adminPanelDiv.style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("rewards").style.display = "none";
     };
 
     window.showRewards = () => {
-      dashboardDiv.style.display = "none";
-      rewardsDiv.style.display = "block";
-      adminPanelDiv.style.display = "none";
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "block";
     };
 
-    // Show Admin Panel and load reward requests & diagnostics
-    window.showAdminPanel = async () => {
-      dashboardDiv.style.display = "none";
-      rewardsDiv.style.display = "none";
-      adminPanelDiv.style.display = "block";
-
-      await loadDiagnostics();
-      await loadRewardRequests();
-    };
-
-    window.requestReward = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        alert("You must be logged in to request a reward.");
-        return;
-      }
-
-      const rewardType = rewardTypeSelect.value;
-      const rewardDetails = rewardDetailsInput.value.trim();
-
-      if (!rewardDetails) {
-        alert("Please enter your username or wallet address.");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "rewardRequests"), {
-          userId: user.uid,
-          userEmail: user.email,
-          rewardType,
-          rewardDetails,
-          timestamp: new Date(),
-          status: "pending"
-        });
-        alert("Reward request submitted!");
-        rewardDetailsInput.value = "";
-      } catch (error) {
-        alert("Failed to submit reward request: " + error.message);
-      }
-    };
-
-    // Load diagnostics: summary counts of reward requests
-    async function loadDiagnostics() {
-      const rewardRequestsRef = collection(db, "rewardRequests");
-      const snapshot = await getDocs(rewardRequestsRef);
-
-      let total = 0, pending = 0, approved = 0, denied = 0;
-      snapshot.forEach(doc => {
-        total++;
-        const status = doc.data().status;
-        if (status === "pending") pending++;
-        else if (status === "approved") approved++;
-        else if (status === "denied") denied++;
-      });
-
-      const diagnosticsDiv = document.getElementById("diagnostics");
-      diagnosticsDiv.innerHTML = `
-        <p><strong>Total Requests:</strong> ${total}</p>
-        <p><strong>Pending:</strong> ${pending}</p>
-        <p><strong>Approved:</strong> ${approved}</p>
-        <p><strong>Denied:</strong> ${denied}</p>
-      `;
-    }
-
-    // Load all reward requests into admin panel list
-    async function loadRewardRequests() {
-      const listContainer = document.getElementById("rewardRequestsList");
-      listContainer.innerHTML = "Loading...";
-
-      const rewardQuery = query(collection(db, "rewardRequests"), orderBy("timestamp", "desc"));
-      const querySnapshot = await getDocs(rewardQuery);
-
-      if (querySnapshot.empty) {
-        listContainer.innerHTML = "<p>No reward requests found.</p>";
-        return;
-      }
-
-      let html = "";
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const id = docSnap.id;
-
-        html += `
-          <div class="border p-3 mb-3 rounded bg-dark text-white">
-            <p><strong>User:</strong> ${data.userEmail || data.userId}</p>
-            <p><strong>Type:</strong> ${data.rewardType}</p>
-            <p><strong>Details:</strong> ${data.rewardDetails}</p>
-            <p><strong>Status:</strong> ${data.status}</p>
-            <p><strong>Time:</strong> ${new Date(data.timestamp?.toDate()).toLocaleString()}</p>
-            <button class="btn btn-success btn-sm me-2" onclick="approveRequest('${id}')">Approve</button>
-            <button class="btn btn-danger btn-sm" onclick="denyRequest('${id}')">Deny</button>
-          </div>
-        `;
-      });
-
-      listContainer.innerHTML = html;
-    }
-
-    // Approve reward request
-    window.approveRequest = async (docId) => {
-      const docRef = doc(db, "rewardRequests", docId);
-      await updateDoc(docRef, { status: "approved" });
-      alert("Request approved!");
-      showAdminPanel();
-    };
-
-    // Deny reward request
-    window.denyRequest = async (docId) => {
-      const docRef = doc(db, "rewardRequests", docId);
-      await updateDoc(docRef, { status: "denied" });
-      alert("Request denied!");
-      showAdminPanel();
+    window.requestReward = () => {
+      const type = document.getElementById("rewardType").value;
+      const details = document.getElementById("rewardDetails").value;
+      alert(`Requested ${type} reward for ${details}`);
     };
   </script>
 </body>
