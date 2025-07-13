@@ -18,7 +18,7 @@
 
     .navbar {
       background-color: #2c2c2c;
-      display: none; /* Hide by default, show on login */
+      display: none;
     }
 
     .navbar-brand {
@@ -74,7 +74,7 @@
       color: #fff;
     }
 
-    #dashboard, #rewards {
+    #dashboard, #rewards, #adminPanel {
       display: none;
     }
 
@@ -197,6 +197,13 @@
       </div>
     </div>
 
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="card p-4" style="display:none; margin-top:20px;">
+      <h2 class="text-center mb-4">Admin Panel</h2>
+      <p>Welcome, admin! This panel is visible only to you.</p>
+      <!-- You can add admin features here -->
+    </div>
+
   </div>
 
   <!-- Firebase + Logic -->
@@ -222,23 +229,34 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    onAuthStateChanged(auth, (user) => {
-      const authUI = document.getElementById("auth");
-      const navbar = document.getElementById("topNavbar");
-      const dash = document.getElementById("dashboard");
-      const rewards = document.getElementById("rewards");
+    const authDiv = document.getElementById("auth");
+    const navbar = document.getElementById("topNavbar");
+    const dash = document.getElementById("dashboard");
+    const rewards = document.getElementById("rewards");
+    const adminPanel = document.getElementById("adminPanel");
+    const userEmailSpan = document.getElementById("userEmail");
 
+    const adminEmail = "zelechowskiadam3@gmail.com";
+
+    onAuthStateChanged(auth, (user) => {
       if (user) {
-        authUI.style.display = "none";
-        navbar.style.display = "flex";       // <== SHOW NAVBAR on login
+        authDiv.style.display = "none";
+        navbar.style.display = "flex";
         dash.style.display = "block";
         rewards.style.display = "none";
-        document.getElementById("userEmail").textContent = user.email;
+        userEmailSpan.textContent = user.email;
+
+        if (user.email === adminEmail) {
+          adminPanel.style.display = "block";
+        } else {
+          adminPanel.style.display = "none";
+        }
       } else {
-        authUI.style.display = "block";
-        navbar.style.display = "none";       // <== HIDE NAVBAR on logout
+        authDiv.style.display = "block";
+        navbar.style.display = "none";
         dash.style.display = "none";
         rewards.style.display = "none";
+        adminPanel.style.display = "none";
       }
 
       document.body.style.display = "block";
@@ -261,13 +279,15 @@
     window.logout = () => signOut(auth);
 
     window.showDashboard = () => {
-      document.getElementById("dashboard").style.display = "block";
-      document.getElementById("rewards").style.display = "none";
+      dash.style.display = "block";
+      rewards.style.display = "none";
+      adminPanel.style.display = "none";
     };
 
     window.showRewards = () => {
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("rewards").style.display = "block";
+      dash.style.display = "none";
+      rewards.style.display = "block";
+      adminPanel.style.display = "none";
     };
 
     window.requestReward = () => {
