@@ -131,8 +131,10 @@
     <div class="d-flex ms-auto gap-3" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
+
+      <!-- Admin Panel Dropdown -->
       <div class="dropdown" id="adminPanelDropdown" style="display: none;">
-        <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown">
+        <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           Admin Panel
         </button>
         <ul class="dropdown-menu">
@@ -142,11 +144,90 @@
           <li><a class="dropdown-item" href="#" onclick="adminLookupUser()">User Lookup</a></li>
         </ul>
       </div>
+
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
 
-  <!-- Firebase Logic -->
+  <div class="container py-5">
+    <!-- AUTH -->
+    <div id="auth">
+      <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+        <!-- Info Panel -->
+        <div class="info-box" style="max-width: 450px;">
+          <img
+            src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
+            alt="BloxVault Logo"
+            style="height: 60px; display:block; margin-bottom:15px;"
+          />
+          <h2>Welcome to BloxVault!</h2>
+          <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
+          <h5>How It Works:</h5>
+          <ul>
+            <li>✅ Sign up free</li>
+            <li>✅ Complete tasks & surveys</li>
+            <li>✅ Earn points instantly</li>
+            <li>✅ Redeem for real rewards</li>
+          </ul>
+          <h5>Why Trust Us?</h5>
+          <ul>
+            <li>🔐 Secure — no data selling</li>
+            <li>🎯 Fast payouts (usually 24 hrs)</li>
+            <li>📈 Growing community of real users</li>
+          </ul>
+        </div>
+
+        <!-- Login/Register -->
+        <div class="card p-4" style="max-width: 400px; width: 100%;">
+          <h2 class="text-center mb-4">Login or Register</h2>
+
+          <div class="input-group mb-3">
+            <i class="bi bi-envelope-fill form-icon"></i>
+            <input id="email" type="email" class="form-control" placeholder="Email" />
+          </div>
+
+          <div class="input-group mb-3">
+            <i class="bi bi-lock-fill form-icon"></i>
+            <input id="password" type="password" class="form-control" placeholder="Password" />
+          </div>
+
+          <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+          <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <div class="card p-4 mb-4">
+        <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
+        <p class="text-center">Points: <span id="points">0</span></p>
+      </div>
+
+      <div class="card p-4">
+        <h5>Earn Points</h5>
+        <p>This is your offerwall area. Embed surveys, tasks, etc. here.</p>
+      </div>
+    </div>
+
+    <!-- Rewards -->
+    <div id="rewards">
+      <div class="card p-4">
+        <h2 class="text-center mb-4">Request a Reward</h2>
+        <div class="mb-3">
+          <label for="rewardType" class="form-label">Choose a Reward</label>
+          <select id="rewardType" class="form-select">
+            <option>Robux</option>
+            <option>Crypto</option>
+          </select>
+        </div>
+        <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" />
+        <button onclick="requestReward()" class="btn btn-primary w-100">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -178,47 +259,74 @@
 
       if (user) {
         if (authUI) authUI.style.display = "none";
-        navbar.style.display = "flex";
-        dash.style.display = "block";
-        rewards.style.display = "none";
+        if (navbar) navbar.style.display = "flex";
+        if (dash) dash.style.display = "block";
+        if (rewards) rewards.style.display = "none";
 
-        // ✅ FIXED: Use === for comparison
-        if (user.email === "zelechowskiadam3@gmail.com") {
-          adminPanel.style.display = "block";
-        } else {
-          adminPanel.style.display = "none";
+        if (adminPanel) {
+          if (user.email === "zelechowskiadam3@gmail.com") {
+            adminPanel.style.display = "block";
+          } else {
+            adminPanel.style.display = "none";
+          }
         }
+
+        document.getElementById("userEmail").textContent = user.email;
       } else {
         if (authUI) authUI.style.display = "block";
-        navbar.style.display = "none";
-        dash.style.display = "none";
-        rewards.style.display = "none";
+        if (navbar) navbar.style.display = "none";
+        if (dash) dash.style.display = "none";
+        if (rewards) rewards.style.display = "none";
+        if (adminPanel) adminPanel.style.display = "none";
       }
 
       document.body.style.display = "block";
     });
 
+    window.login = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
+    };
+
+    window.register = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
+    };
+
     window.logout = () => signOut(auth);
+
     window.showDashboard = () => {
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("rewards").style.display = "none";
     };
+
     window.showRewards = () => {
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("rewards").style.display = "block";
     };
 
-    // Admin features
-    window.viewUsers = () => alert("This would fetch and display users.");
-    window.viewRewardRequests = () => alert("This would show pending reward requests.");
-    window.runDiagnostics = () => alert("Running diagnostics...");
+    // Admin panel functions (placeholders)
+    window.viewUsers = () => alert("View users function placeholder");
+    window.viewRewardRequests = () => alert("View reward requests function placeholder");
+    window.runDiagnostics = () => alert("Run diagnostics function placeholder");
     window.adminLookupUser = () => {
       const email = prompt("Enter user email to lookup:");
       if (email) alert("Looking up user: " + email);
     };
+
+    // Reward request (simple alert placeholder)
+    window.requestReward = () => {
+      const type = document.getElementById("rewardType").value;
+      const details = document.getElementById("rewardDetails").value;
+      alert(`Requested ${type} reward for ${details}`);
+    };
   </script>
 
-  <!-- Bootstrap JS -->
+  <!-- Bootstrap JS Bundle (for dropdown) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
