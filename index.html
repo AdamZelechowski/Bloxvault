@@ -105,22 +105,34 @@
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
       BloxVault
     </a>
-    <div class="d-flex ms-auto gap-3 align-items-center" id="navButtons">
-      <span class="text-white fw-bold">Gems: <span id="points">0</span></span>
+    <div class="d-flex ms-auto gap-3" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
+      <button class="btn btn-link nav-link" onclick="showAdminPanel()" id="adminNavBtn" style="display:none;"><i class="bi bi-terminal"></i> Admin Panel</button>
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
 
   <div class="container py-5">
-    <!-- AUTH -->
     <div id="auth">
       <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
         <div class="info-box" style="max-width: 450px;">
-          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;" />
+          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;">
           <h2>Welcome to BloxVault!</h2>
           <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
+          <h5>How It Works:</h5>
+          <ul>
+            <li>✅ Sign up free</li>
+            <li>✅ Complete tasks & surveys</li>
+            <li>✅ Earn points instantly</li>
+            <li>✅ Redeem for real rewards</li>
+          </ul>
+          <h5>Why Trust Us?</h5>
+          <ul>
+            <li>🔐 Secure — no data selling</li>
+            <li>🎯 Fast payouts (usually 24 hrs)</li>
+            <li>📈 Growing community of real users</li>
+          </ul>
         </div>
 
         <div class="card p-4" style="max-width: 400px; width: 100%;">
@@ -139,14 +151,16 @@
       </div>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
       </div>
+      <div class="card p-4">
+        <h5>Earn Points</h5>
+        <p>This is your offerwall area. Embed surveys, tasks, etc. here.</p>
+      </div>
     </div>
 
-    <!-- Rewards -->
     <div id="rewards">
       <div class="card p-4">
         <h2 class="text-center mb-4">Request a Reward</h2>
@@ -162,14 +176,11 @@
       </div>
     </div>
 
-    <!-- Admin Panel -->
     <div id="adminPanel">
       <div class="card p-4">
-        <h2 class="text-center">Admin Panel</h2>
-        <p class="text-center">You are logged in as an admin.</p>
-        <button class="btn btn-light mb-2" onclick="alert('Coming soon: View users')">👥 View Users</button>
-        <button class="btn btn-light mb-2" onclick="alert('Coming soon: Approve rewards')">🎁 Review Rewards</button>
-        <button class="btn btn-light mb-2" onclick="alert('Coming soon: Site diagnostics')">🛠️ Site Diagnostics</button>
+        <h2 class="text-center mb-4">Admin Panel</h2>
+        <p>Welcome, admin! Here you can manage the site and view diagnostics.</p>
+        <!-- Future features like user and reward management go here -->
       </div>
     </div>
   </div>
@@ -183,14 +194,6 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      collection,
-      addDoc
-    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -203,37 +206,24 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
 
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       const authUI = document.getElementById("auth");
       const navbar = document.getElementById("topNavbar");
       const dash = document.getElementById("dashboard");
       const rewards = document.getElementById("rewards");
       const adminPanel = document.getElementById("adminPanel");
-      const userEmailSpan = document.getElementById("userEmail");
-      const pointsSpan = document.getElementById("points");
+      const adminNavBtn = document.getElementById("adminNavBtn");
 
       if (user) {
         authUI.style.display = "none";
         navbar.style.display = "flex";
         dash.style.display = "block";
         rewards.style.display = "none";
-        userEmailSpan.textContent = user.email;
-
-        const userDocRef = doc(db, "users", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          pointsSpan.textContent = userDocSnap.data().points || 0;
-        } else {
-          await setDoc(userDocRef, { points: 0 });
-          pointsSpan.textContent = "0";
-        }
+        document.getElementById("userEmail").textContent = user.email;
 
         if (user.email === "zelechowskiadam3@gmail.com") {
-          adminPanel.style.display = "block";
-        } else {
-          adminPanel.style.display = "none";
+          adminNavBtn.style.display = "inline-block";
         }
       } else {
         authUI.style.display = "block";
@@ -263,34 +253,25 @@
     window.showDashboard = () => {
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("rewards").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
     };
 
     window.showRewards = () => {
       document.getElementById("dashboard").style.display = "none";
       document.getElementById("rewards").style.display = "block";
+      document.getElementById("adminPanel").style.display = "none";
     };
 
-    window.requestReward = async () => {
-      const rewardType = document.getElementById("rewardType").value;
-      const rewardDetails = document.getElementById("rewardDetails").value.trim();
-      const user = auth.currentUser;
+    window.showAdminPanel = () => {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+    };
 
-      if (!user || !rewardDetails) {
-        alert("Fill in all fields and be logged in.");
-        return;
-      }
-
-      await addDoc(collection(db, "rewardRequests"), {
-        userId: user.uid,
-        userEmail: user.email,
-        rewardType,
-        rewardDetails,
-        timestamp: new Date(),
-        status: "pending"
-      });
-
-      alert("Reward request submitted!");
-      document.getElementById("rewardDetails").value = "";
+    window.requestReward = () => {
+      const type = document.getElementById("rewardType").value;
+      const details = document.getElementById("rewardDetails").value;
+      alert(`Requested ${type} reward for ${details}`);
     };
   </script>
 </body>
