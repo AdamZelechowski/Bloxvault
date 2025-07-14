@@ -191,7 +191,7 @@
       text-align: center;
     }
 
-    /* ------------------- LOGIN PAGE IMPROVEMENTS ------------------- */
+    /* ------------------- LOGIN PAGE IMPROVEMENTS & CENTERING ------------------- */
 
     #auth {
       min-height: 80vh;
@@ -205,13 +205,16 @@
       background: #3a3a3a;
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      padding: 30px 40px;
+      padding: 30px;
       max-width: 900px;
       width: 100%;
-      display: flex;
-      gap: 40px;
-      flex-wrap: nowrap;
-      align-items: stretch;
+      gap: 40px !important;
+
+      /* Center horizontally and vertically */
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      flex-wrap: wrap;
     }
 
     .info-box {
@@ -221,21 +224,7 @@
       box-shadow: inset 0 0 15px rgba(255, 187, 51, 0.25);
       color: #fff;
       flex: 1 1 400px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .card.p-4 {
-      background-color: #2c2c2c !important;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      border: 2px solid #ffbb33 !important;
-      padding: 30px !important;
-      flex: 0 0 380px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      max-width: 450px;
     }
 
     .info-box h2 {
@@ -254,6 +243,25 @@
       padding-left: 20px;
       color: #fff;
       font-size: 1rem;
+    }
+
+    /* Login/Register card */
+    .card.p-4 {
+      background-color: #2c2c2c !important;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      border: 2px solid #ffbb33 !important;
+      padding: 30px !important;
+      flex: 1 1 350px;
+      max-width: 400px;
+    }
+
+    .card.p-4 h2 {
+      color: #ffbb33;
+      font-weight: 900;
+      margin-bottom: 30px;
+      text-align: center;
+      letter-spacing: 1px;
     }
 
     /* Input groups */
@@ -371,7 +379,6 @@
       box-shadow: 0 0 10px #c9302caa;
       outline: none;
     }
-
   </style>
 </head>
 <body>
@@ -413,9 +420,9 @@
 
     <!-- AUTH -->
     <div id="auth">
-      <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+      <div class="auth-container">
         <!-- Info Panel -->
-        <div class="info-box" style="max-width: 450px;">
+        <div class="info-box">
           <img
             src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
             alt="BloxVault Logo"
@@ -439,7 +446,7 @@
         </div>
 
         <!-- Login/Register -->
-        <div class="card p-4" style="max-width: 400px; width: 100%;">
+        <div class="card p-4">
           <h2 class="text-center mb-4">Login or Register</h2>
 
           <div class="input-group mb-3">
@@ -535,116 +542,189 @@
           </select>
         </div>
         <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" />
-        <button onclick="submitRewardRequest()" class="btn btn-primary w-100">Submit Request</button>
+        <button onclick="requestReward()" class="btn btn-primary w-100">Submit</button>
       </div>
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Firebase + Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      sendPasswordResetEmail,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
-  <!-- Optional: Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
+      authDomain: "bloxvault-d1ff0.firebaseapp.com",
+      projectId: "bloxvault-d1ff0",
+      storageBucket: "bloxvault-d1ff0.appspot.com",
+      messagingSenderId: "365008891027",
+      appId: "1:365008891027:web:3578577b3c33714f207166"
+    };
 
-  <script>
-    // Show or hide sections
-    function showDashboard() {
-      document.getElementById('auth').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('rewards').style.display = 'none';
-    }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    function showRewards() {
-      document.getElementById('auth').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'none';
-      document.getElementById('rewards').style.display = 'block';
-    }
+    onAuthStateChanged(auth, async (user) => {
+      const authUI = document.getElementById("auth");
+      const navbar = document.getElementById("topNavbar");
+      const dash = document.getElementById("dashboard");
+      const rewards = document.getElementById("rewards");
+      const adminPanel = document.getElementById("adminPanelDropdown");
+      const gemsCountSpan = document.getElementById("gemsCount");
 
-    // Login, Register, Forgot, Google Login stubs
-    function login() {
-      alert('Login clicked');
-      // TODO: add real login
-    }
+      if (user) {
+        if (authUI) authUI.style.display = "none";
+        if (navbar) navbar.style.display = "flex";
+        if (dash) dash.style.display = "block";
+        if (rewards) rewards.style.display = "none";
 
-    function register() {
-      alert('Register clicked');
-      // TODO: add real register
-    }
+        if (adminPanel) {
+          if (user.email === "zelechowskiadam3@gmail.com") {
+            adminPanel.style.display = "block";
+          } else {
+            adminPanel.style.display = "none";
+          }
+        }
 
-    function forgotPassword() {
-      alert('Password recovery clicked');
-      // TODO: add password recovery
-    }
+        document.getElementById("userEmail").textContent = user.email;
 
-    function googleLogin() {
-      alert('Google login clicked');
-      // TODO: add google login
-    }
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const gems = userDoc.data().points || 0;
+            gemsCountSpan.textContent = gems;
+          } else {
+            gemsCountSpan.textContent = "0";
+          }
+        } catch (error) {
+          console.error("Error fetching gems:", error);
+          gemsCountSpan.textContent = "0";
+        }
+      } else {
+        if (authUI) authUI.style.display = "block";
+        if (navbar) navbar.style.display = "none";
+        if (dash) dash.style.display = "none";
+        if (rewards) rewards.style.display = "none";
+        if (adminPanel) adminPanel.style.display = "none";
+        if (gemsCountSpan) gemsCountSpan.textContent = "0";
+      }
 
-    // Logout stub
-    function logout() {
-      alert('Logout clicked');
-      // TODO: add logout functionality
-    }
+      document.body.style.display = "block";
+    });
 
-    // Admin Panel stubs
-    function viewUsers() {
-      alert('View Users clicked');
-    }
+    window.login = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
+    };
 
-    function viewRewardRequests() {
-      alert('Reward Requests clicked');
-    }
+    window.register = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
+    };
 
-    function runDiagnostics() {
-      alert('Diagnostics running');
-    }
+    window.logout = () => signOut(auth);
 
-    function adminLookupUser() {
-      alert('User lookup clicked');
-    }
+    window.showDashboard = () => {
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("rewards").style.display = "none";
+    };
 
-    // Reward submission stub
-    function submitRewardRequest() {
-      alert('Reward request submitted');
-    }
+    window.showRewards = () => {
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "block";
+    };
 
-    // Example chart data (monthly earnings)
-    const ctx = document.getElementById('earningsChart');
-    if (ctx) {
-      const earningsChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-          datasets: [{
-            label: 'Gems',
-            data: [400, 600, 500, 700],
-            backgroundColor: '#ffbb33',
-          }],
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-        },
-      });
-    }
+    window.viewUsers = () => alert("View users function placeholder");
+    window.viewRewardRequests = () => alert("View reward requests function placeholder");
+    window.runDiagnostics = () => alert("Run diagnostics function placeholder");
+    window.adminLookupUser = () => {
+      const email = prompt("Enter user email to lookup:");
+      if (email) alert("Looking up user: " + email);
+    };
 
-    // Initially show login page
-    document.getElementById('auth').style.display = 'flex';
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('rewards').style.display = 'none';
+    window.requestReward = () => {
+      const type = document.getElementById("rewardType").value;
+      const details = document.getElementById("rewardDetails").value;
+      alert(`Requested ${type} reward for ${details}`);
+    };
 
-    // Show body now to prevent flicker
-    document.body.style.display = 'block';
+    window.forgotPassword = () => {
+      const email = prompt("Please enter your email to reset password:");
+      if (email) {
+        sendPasswordResetEmail(auth, email)
+          .then(() => alert("Password reset email sent! Check your inbox."))
+          .catch((error) => alert("Error: " + error.message));
+      }
+    };
+
+    window.googleLogin = () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .catch(err => alert(err.message));
+    };
   </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('earningsChart').getContext('2d');
+    const earningsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()),
+        datasets: [{
+          label: 'Gems Earned',
+          data: Array(31).fill(0),
+          borderColor: '#ffbb33',
+          backgroundColor: 'rgba(255, 187, 51, 0.2)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { display: true, color: '#ffbb33', font: { weight: 'bold' } },
+            grid: { color: '#444' }
+          },
+          x: {
+            ticks: { display: true, color: '#ffbb33', font: { weight: 'bold' } },
+            grid: { color: '#444' }
+          }
+        },
+        plugins: {
+          legend: { labels: { color: '#ffbb33', font: { weight: 'bold' } } }
+        }
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
