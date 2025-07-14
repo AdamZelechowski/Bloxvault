@@ -256,30 +256,24 @@
           </ul>
         </div>
 
-        <!-- Updated Login/Register -->
-        <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <!-- Login/Register -->
+        <div class="card p-4" style="max-width: 400px; width: 100%;">
           <h2 class="text-center mb-4">Login or Register</h2>
 
           <div class="input-group mb-3">
-            <span class="input-group-text bg-dark text-warning"><i class="bi bi-envelope-fill"></i></span>
+            <i class="bi bi-envelope-fill form-icon"></i>
             <input id="email" type="email" class="form-control" placeholder="Email" />
           </div>
 
-          <div class="input-group mb-2">
-            <span class="input-group-text bg-dark text-warning"><i class="bi bi-lock-fill"></i></span>
+          <div class="input-group mb-3">
+            <i class="bi bi-lock-fill form-icon"></i>
             <input id="password" type="password" class="form-control" placeholder="Password" />
           </div>
 
-          <div class="text-end mb-3">
-            <a href="#" id="forgotPass" style="color: #ffbb33; text-decoration: underline; cursor: pointer;">Forgot Password?</a>
-          </div>
-
-          <button onclick="login()" class="btn btn-warning w-100 mb-3 fw-bold">Login</button>
-          <button onclick="register()" class="btn btn-outline-light w-100 mb-3 fw-bold">Register</button>
-
-          <hr class="border-warning" />
-
-          <button id="googleLoginBtn" class="btn btn-danger w-100 fw-bold">
+          <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+          <button onclick="register()" class="btn btn-outline-light w-100 mb-2">Register</button>
+          <button onclick="forgotPassword()" class="btn btn-link w-100">Forgot Password?</button>
+          <button onclick="googleLogin()" class="btn btn-danger w-100 mt-3">
             <i class="bi bi-google"></i> Login with Google
           </button>
         </div>
@@ -330,11 +324,10 @@
           </ul>
         </div>
 
-        <!-- Earn Box (added previously, kept here) -->
-        <div id="earnBox" style="background:#3a3a3a; border:2px solid #ffbb33; border-radius:10px; color:white; padding:20px; flex:1 1 300px; max-width:350px; box-sizing:border-box; text-align:center;">
-          <h5 style="color:#ffbb33; margin-bottom:15px; font-weight:bold;">Earn</h5>
-          <p>Complete surveys and tasks to increase your gems balance!</p>
-          <!-- You can add buttons or links here later -->
+        <!-- Earn Box -->
+        <div id="earnBox">
+          <h5>Earn Gems Fast</h5>
+          <p>Complete surveys and offers daily to increase your gem balance quickly.</p>
         </div>
 
         <!-- Quick Stats -->
@@ -482,35 +475,84 @@
     window.requestReward = () => {
       const type = document.getElementById("rewardType").value;
       const details = document.getElementById("rewardDetails").value;
-      alert(`Reward request submitted for ${type} with details: ${details}`);
+      alert(`Requested ${type} reward for ${details}`);
     };
 
-    // Forgot password logic moved to inline script with prompt & reset call.
-
-    // Google Login with Firebase - Implemented here:
-    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        alert("Google login error: " + error.message);
-      }
-    });
-  </script>
-
-  <!-- Bootstrap JS bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // Forgot password handler moved here to listen after load
-    document.getElementById('forgotPass').addEventListener('click', () => {
-      const email = prompt('Please enter your email to reset password:');
+    window.forgotPassword = () => {
+      const email = prompt("Please enter your email to reset password:");
       if (email) {
         sendPasswordResetEmail(auth, email)
-          .then(() => alert('Password reset email sent! Check your inbox.'))
-          .catch(e => alert('Error sending reset email: ' + e.message));
+          .then(() => alert("Password reset email sent! Check your inbox."))
+          .catch((error) => alert("Error: " + error.message));
+      }
+    };
+
+    window.googleLogin = () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .catch(err => alert(err.message));
+    };
+  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('earningsChart').getContext('2d');
+    const earningsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()), // Days 1 to 31
+        datasets: [{
+          label: 'Gems Earned',
+          data: Array(31).fill(0), // zeroed data
+          borderColor: '#ffbb33',
+          backgroundColor: 'rgba(255, 187, 51, 0.2)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              display: true,
+              color: '#ffbb33',
+              font: { weight: 'bold' }
+            },
+            grid: {
+              color: '#444'
+            }
+          },
+          x: {
+            ticks: {
+              display: true,
+              color: '#ffbb33',
+              font: { weight: 'bold' }
+            },
+            grid: {
+              color: '#444'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#ffbb33',
+              font: { weight: 'bold' }
+            }
+          }
+        }
       }
     });
   </script>
+
+  <!-- Bootstrap JS Bundle (for dropdown) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
