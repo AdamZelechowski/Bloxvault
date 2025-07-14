@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BloxVault</title>
 
-  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
@@ -36,17 +35,6 @@
     .nav-link, .btn-link {
       color: #fff !important;
       font-weight: bold;
-    }
-
-    .gem-counter {
-      color: #00eaff;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-    }
-
-    .gem-counter i {
-      margin-right: 6px;
     }
 
     .info-box {
@@ -85,7 +73,7 @@
       color: #fff;
     }
 
-    #dashboard, #rewards {
+    #dashboard, #rewards, #adminPanel {
       display: none;
     }
 
@@ -108,25 +96,17 @@
       .auth-container {
         flex-direction: column;
       }
-
-      .gem-counter {
-        display: none;
-      }
     }
   </style>
 </head>
 <body>
-
-  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
       BloxVault
     </a>
-    <div class="ms-auto d-flex gap-3 align-items-center" id="navButtons">
-      <div class="gem-counter">
-        <i class="bi bi-gem"></i> <span id="navbarGems">0</span>
-      </div>
+    <div class="d-flex ms-auto gap-3 align-items-center" id="navButtons">
+      <span class="text-white fw-bold">Gems: <span id="points">0</span></span>
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
@@ -134,42 +114,25 @@
   </nav>
 
   <div class="container py-5">
-
     <!-- AUTH -->
     <div id="auth">
       <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
         <div class="info-box" style="max-width: 450px;">
           <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;" />
           <h2>Welcome to BloxVault!</h2>
-          <p><strong>BloxVault</strong> is a free rewards platform where you earn gems by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
-          <h5>How It Works:</h5>
-          <ul>
-            <li>✅ Sign up free</li>
-            <li>✅ Complete tasks & surveys</li>
-            <li>✅ Earn gems instantly</li>
-            <li>✅ Redeem for real rewards</li>
-          </ul>
-          <h5>Why Trust Us?</h5>
-          <ul>
-            <li>🔐 Secure — no data selling</li>
-            <li>🎯 Fast payouts (usually 24 hrs)</li>
-            <li>📈 Growing community of real users</li>
-          </ul>
+          <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
         </div>
 
         <div class="card p-4" style="max-width: 400px; width: 100%;">
           <h2 class="text-center mb-4">Login or Register</h2>
-
           <div class="input-group mb-3">
             <i class="bi bi-envelope-fill form-icon"></i>
             <input id="email" type="email" class="form-control" placeholder="Email" />
           </div>
-
           <div class="input-group mb-3">
             <i class="bi bi-lock-fill form-icon"></i>
             <input id="password" type="password" class="form-control" placeholder="Password" />
           </div>
-
           <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
           <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
         </div>
@@ -178,17 +141,8 @@
 
     <!-- Dashboard -->
     <div id="dashboard">
-      <div class="card p-4 mb-4 text-center">
-        <h2>Welcome, <span id="userEmail">User</span></h2>
-        <h4>
-          <i class="bi bi-gem" style="color: #00eaff;"></i>
-          Gems: <span id="gems">0</span>
-        </h4>
-      </div>
-
-      <div class="card p-4">
-        <h5>Earn Gems</h5>
-        <p>This is your offerwall area. Embed surveys, tasks, etc. here.</p>
+      <div class="card p-4 mb-4">
+        <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
       </div>
     </div>
 
@@ -208,9 +162,18 @@
       </div>
     </div>
 
+    <!-- Admin Panel -->
+    <div id="adminPanel">
+      <div class="card p-4">
+        <h2 class="text-center">Admin Panel</h2>
+        <p class="text-center">You are logged in as an admin.</p>
+        <button class="btn btn-light mb-2" onclick="alert('Coming soon: View users')">👥 View Users</button>
+        <button class="btn btn-light mb-2" onclick="alert('Coming soon: Approve rewards')">🎁 Review Rewards</button>
+        <button class="btn btn-light mb-2" onclick="alert('Coming soon: Site diagnostics')">🛠️ Site Diagnostics</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -242,20 +205,17 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const userEmailSpan = document.getElementById("userEmail");
-    const gemsSpan = document.getElementById("gems");
-    const navbarGems = document.getElementById("navbarGems");
-
-    const authDiv = document.getElementById("auth");
-    const navbar = document.getElementById("topNavbar");
-    const dash = document.getElementById("dashboard");
-    const rewards = document.getElementById("rewards");
-
     onAuthStateChanged(auth, async (user) => {
+      const authUI = document.getElementById("auth");
+      const navbar = document.getElementById("topNavbar");
+      const dash = document.getElementById("dashboard");
+      const rewards = document.getElementById("rewards");
+      const adminPanel = document.getElementById("adminPanel");
+      const userEmailSpan = document.getElementById("userEmail");
+      const pointsSpan = document.getElementById("points");
+
       if (user) {
-        authDiv.style.display = "none";
+        authUI.style.display = "none";
         navbar.style.display = "flex";
         dash.style.display = "block";
         rewards.style.display = "none";
@@ -263,58 +223,62 @@
 
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
-
         if (userDocSnap.exists()) {
-          const gems = userDocSnap.data().gems || 0;
-          gemsSpan.textContent = gems;
-          navbarGems.textContent = gems;
+          pointsSpan.textContent = userDocSnap.data().points || 0;
         } else {
-          await setDoc(userDocRef, { gems: 0 });
-          gemsSpan.textContent = "0";
-          navbarGems.textContent = "0";
+          await setDoc(userDocRef, { points: 0 });
+          pointsSpan.textContent = "0";
+        }
+
+        if (user.email === "zelechowskiadam3@gmail.com") {
+          adminPanel.style.display = "block";
+        } else {
+          adminPanel.style.display = "none";
         }
       } else {
-        authDiv.style.display = "block";
+        authUI.style.display = "block";
         navbar.style.display = "none";
         dash.style.display = "none";
         rewards.style.display = "none";
+        adminPanel.style.display = "none";
       }
 
       document.body.style.display = "block";
     });
 
     window.login = () => {
-      signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
-        .catch(err => alert(err.message));
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
     };
 
     window.register = () => {
-      createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value)
-        .then(async (cred) => {
-          await setDoc(doc(db, "users", cred.user.uid), { gems: 0 });
-        })
-        .catch(err => alert(err.message));
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
     };
 
     window.logout = () => signOut(auth);
 
     window.showDashboard = () => {
-      dash.style.display = "block";
-      rewards.style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("rewards").style.display = "none";
     };
 
     window.showRewards = () => {
-      dash.style.display = "none";
-      rewards.style.display = "block";
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("rewards").style.display = "block";
     };
 
     window.requestReward = async () => {
-      const user = auth.currentUser;
-      if (!user) return alert("Login required");
-
       const rewardType = document.getElementById("rewardType").value;
       const rewardDetails = document.getElementById("rewardDetails").value.trim();
-      if (!rewardDetails) return alert("Please enter your username or wallet");
+      const user = auth.currentUser;
+
+      if (!user || !rewardDetails) {
+        alert("Fill in all fields and be logged in.");
+        return;
+      }
 
       await addDoc(collection(db, "rewardRequests"), {
         userId: user.uid,
