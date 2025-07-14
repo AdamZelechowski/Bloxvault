@@ -47,24 +47,26 @@
       user-select: none;
     }
 
-    /* RGB chroma effect for admin panel */
-    @keyframes chroma {
-      0% { color: red; }
-      17% { color: orange; }
-      34% { color: yellow; }
-      51% { color: green; }
-      68% { color: blue; }
-      85% { color: indigo; }
-      100% { color: violet; }
+    /* RGB chroma background animation for admin panel */
+    @keyframes rgbChromaBG {
+      0%   { background-color: rgb(255, 0, 0); }
+      16%  { background-color: rgb(255, 127, 0); }
+      33%  { background-color: rgb(255, 255, 0); }
+      50%  { background-color: rgb(0, 255, 0); }
+      66%  { background-color: rgb(0, 0, 255); }
+      83%  { background-color: rgb(75, 0, 130); }
+      100% { background-color: rgb(148, 0, 211); }
     }
 
     #adminDropdownMenu {
-      animation: chroma 5s linear infinite;
-      background-color: #222;
-      border-radius: 6px;
+      animation: rgbChromaBG 7s linear infinite;
+      border-radius: 8px;
       padding: 15px;
       margin-top: 10px;
       color: white;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+      user-select: none;
+      min-width: 200px;
     }
 
     #adminPanel {
@@ -152,8 +154,8 @@
         </button>
         <div id="adminDropdownMenu" style="display:none;">
           <button class="btn btn-primary w-100 mb-2" onclick="runDiagnostics()">Run Diagnostics</button>
-          <button class="btn btn-primary w-100 mb-2" onclick="resetUserPoints()">Reset User Points</button>
-          <button class="btn btn-primary w-100" onclick="logout()">Logout</button>
+          <button class="btn btn-primary w-100" onclick="resetUserPoints()">Reset User Points</button>
+          <!-- Logout button REMOVED as requested -->
         </div>
       </div>
     </div>
@@ -213,7 +215,7 @@
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
-        <!-- Removed redundant gems counter here as requested -->
+        <!-- No gem counter here, per your request -->
       </div>
 
       <div class="card p-4">
@@ -298,19 +300,9 @@
       alert("Diagnostics check: All systems operational!");
     };
 
-    // Reset points for all users (example function)
+    // Reset points for all users (placeholder)
     window.resetUserPoints = async () => {
-      if (!confirm("Are you sure you want to reset points for all users?")) return;
-      try {
-        const usersSnapshot = await collection(db, "users").get();
-        // Note: The following Firestore SDK v10 doesn't support .get() on collection directly
-        // So you would need to use getDocs(collection(db, "users")) instead, but for brevity here:
-        // Assuming you import getDocs:
-        // const usersSnapshot = await getDocs(collection(db, "users"));
-        alert("This feature requires Firestore batch writes setup.");
-      } catch (err) {
-        alert("Error resetting points: " + err.message);
-      }
+      alert("Reset user points feature coming soon.");
     };
 
     // Monitor auth state and toggle UI accordingly
