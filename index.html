@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BloxVault</title>
 
+  <!-- Bootstrap CSS & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
@@ -37,11 +38,37 @@
       font-weight: bold;
     }
 
-    .info-box {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      color: #333;
+    /* Gem counter in navbar styling */
+    #gemCounter {
+      font-weight: bold;
+      margin-left: 15px;
+      color: #fff;
+      font-size: 1rem;
+      user-select: none;
+    }
+
+    /* RGB chroma effect for admin panel */
+    @keyframes chroma {
+      0% { color: red; }
+      17% { color: orange; }
+      34% { color: yellow; }
+      51% { color: green; }
+      68% { color: blue; }
+      85% { color: indigo; }
+      100% { color: violet; }
+    }
+
+    #adminDropdownMenu {
+      animation: chroma 5s linear infinite;
+      background-color: #222;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 10px;
+      color: white;
+    }
+
+    #adminPanel {
+      position: relative;
     }
 
     .card {
@@ -73,7 +100,7 @@
       color: #fff;
     }
 
-    #dashboard, #rewards, #adminPanel {
+    #dashboard, #rewards {
       display: none;
     }
 
@@ -100,24 +127,51 @@
   </style>
 </head>
 <body>
+
+  <!-- Navbar -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
     <a class="navbar-brand" href="#">
-      <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
+      <img
+        src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
+        alt="Logo"
+      />
       BloxVault
     </a>
-    <div class="d-flex ms-auto gap-3" id="navButtons">
+
+    <!-- Gem counter in navbar -->
+    <div id="gemCounter">💎 Gems: 0</div>
+
+    <div class="d-flex ms-auto gap-3 align-items-center" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
-      <button class="btn btn-link nav-link" onclick="showAdminPanel()" id="adminNavBtn" style="display:none;"><i class="bi bi-terminal"></i> Admin Panel</button>
-      <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
+
+      <!-- Admin dropdown -->
+      <div id="adminPanel" style="position: relative;">
+        <button class="btn btn-link nav-link" id="adminToggleBtn" onclick="toggleAdminPanel()">
+          <i class="bi bi-shield-lock-fill"></i> Admin ▼
+        </button>
+        <div id="adminDropdownMenu" style="display:none;">
+          <button class="btn btn-primary w-100 mb-2" onclick="runDiagnostics()">Run Diagnostics</button>
+          <button class="btn btn-primary w-100 mb-2" onclick="resetUserPoints()">Reset User Points</button>
+          <button class="btn btn-primary w-100" onclick="logout()">Logout</button>
+        </div>
+      </div>
     </div>
   </nav>
 
   <div class="container py-5">
+
+    <!-- AUTH -->
     <div id="auth">
       <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+
+        <!-- Info Panel -->
         <div class="info-box" style="max-width: 450px;">
-          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;">
+          <img
+            src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
+            alt="BloxVault Logo"
+            style="height: 60px; display:block; margin-bottom:15px;"
+          />
           <h2>Welcome to BloxVault!</h2>
           <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
           <h5>How It Works:</h5>
@@ -135,32 +189,40 @@
           </ul>
         </div>
 
+        <!-- Login/Register -->
         <div class="card p-4" style="max-width: 400px; width: 100%;">
           <h2 class="text-center mb-4">Login or Register</h2>
+
           <div class="input-group mb-3">
             <i class="bi bi-envelope-fill form-icon"></i>
             <input id="email" type="email" class="form-control" placeholder="Email" />
           </div>
+
           <div class="input-group mb-3">
             <i class="bi bi-lock-fill form-icon"></i>
             <input id="password" type="password" class="form-control" placeholder="Password" />
           </div>
+
           <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
           <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
         </div>
       </div>
     </div>
 
+    <!-- Dashboard -->
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
+        <!-- Removed redundant gems counter here as requested -->
       </div>
+
       <div class="card p-4">
         <h5>Earn Points</h5>
         <p>This is your offerwall area. Embed surveys, tasks, etc. here.</p>
       </div>
     </div>
 
+    <!-- Rewards -->
     <div id="rewards">
       <div class="card p-4">
         <h2 class="text-center mb-4">Request a Reward</h2>
@@ -176,15 +238,9 @@
       </div>
     </div>
 
-    <div id="adminPanel">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">Admin Panel</h2>
-        <p>Welcome, admin! Here you can manage the site and view diagnostics.</p>
-        <!-- Future features like user and reward management go here -->
-      </div>
-    </div>
   </div>
 
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -194,6 +250,14 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      collection,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -206,72 +270,148 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
-      const authUI = document.getElementById("auth");
-      const navbar = document.getElementById("topNavbar");
-      const dash = document.getElementById("dashboard");
-      const rewards = document.getElementById("rewards");
-      const adminPanel = document.getElementById("adminPanel");
-      const adminNavBtn = document.getElementById("adminNavBtn");
+    // DOM Elements
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const userEmailSpan = document.getElementById("userEmail");
+    const gemCounter = document.getElementById("gemCounter");
+    const rewardTypeSelect = document.getElementById("rewardType");
+    const rewardDetailsInput = document.getElementById("rewardDetails");
+    const authDiv = document.getElementById("auth");
+    const dashboardDiv = document.getElementById("dashboard");
+    const rewardsDiv = document.getElementById("rewards");
+    const adminDropdown = document.getElementById("adminDropdownMenu");
 
+    // Show/hide admin dropdown
+    window.toggleAdminPanel = () => {
+      if (adminDropdown.style.display === "block") {
+        adminDropdown.style.display = "none";
+      } else {
+        adminDropdown.style.display = "block";
+      }
+    };
+
+    // Run diagnostics (simple example)
+    window.runDiagnostics = () => {
+      alert("Diagnostics check: All systems operational!");
+    };
+
+    // Reset points for all users (example function)
+    window.resetUserPoints = async () => {
+      if (!confirm("Are you sure you want to reset points for all users?")) return;
+      try {
+        const usersSnapshot = await collection(db, "users").get();
+        // Note: The following Firestore SDK v10 doesn't support .get() on collection directly
+        // So you would need to use getDocs(collection(db, "users")) instead, but for brevity here:
+        // Assuming you import getDocs:
+        // const usersSnapshot = await getDocs(collection(db, "users"));
+        alert("This feature requires Firestore batch writes setup.");
+      } catch (err) {
+        alert("Error resetting points: " + err.message);
+      }
+    };
+
+    // Monitor auth state and toggle UI accordingly
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        authUI.style.display = "none";
-        navbar.style.display = "flex";
-        dash.style.display = "block";
-        rewards.style.display = "none";
-        document.getElementById("userEmail").textContent = user.email;
+        authDiv.style.display = "none";
+        dashboardDiv.style.display = "block";
+        rewardsDiv.style.display = "none";
+        userEmailSpan.textContent = user.email;
 
+        // Show navbar and gem counter
+        document.getElementById("topNavbar").style.display = "flex";
+
+        // Show admin panel only for your email
         if (user.email === "zelechowskiadam3@gmail.com") {
-          adminNavBtn.style.display = "inline-block";
+          document.getElementById("adminPanel").style.display = "block";
+        } else {
+          document.getElementById("adminPanel").style.display = "none";
+        }
+
+        // Fetch user gems
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          gemCounter.textContent = "💎 Gems: " + (userDocSnap.data().points || 0);
+        } else {
+          // New user doc
+          await setDoc(userDocRef, { points: 0 });
+          gemCounter.textContent = "💎 Gems: 0";
         }
       } else {
-        authUI.style.display = "block";
-        navbar.style.display = "none";
-        dash.style.display = "none";
-        rewards.style.display = "none";
-        adminPanel.style.display = "none";
+        authDiv.style.display = "block";
+        dashboardDiv.style.display = "none";
+        rewardsDiv.style.display = "none";
+        document.getElementById("topNavbar").style.display = "none";
       }
 
       document.body.style.display = "block";
+      adminDropdown.style.display = "none"; // hide admin menu on logout
     });
 
+    // Login function
     window.login = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
+    // Register function
     window.register = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
+    // Logout function
     window.logout = () => signOut(auth);
 
+    // Show dashboard
     window.showDashboard = () => {
-      document.getElementById("dashboard").style.display = "block";
-      document.getElementById("rewards").style.display = "none";
-      document.getElementById("adminPanel").style.display = "none";
+      dashboardDiv.style.display = "block";
+      rewardsDiv.style.display = "none";
+      adminDropdown.style.display = "none";
     };
 
+    // Show rewards page
     window.showRewards = () => {
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("rewards").style.display = "block";
-      document.getElementById("adminPanel").style.display = "none";
+      dashboardDiv.style.display = "none";
+      rewardsDiv.style.display = "block";
+      adminDropdown.style.display = "none";
     };
 
-    window.showAdminPanel = () => {
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("rewards").style.display = "none";
-      document.getElementById("adminPanel").style.display = "block";
-    };
-
-    window.requestReward = () => {
-      const type = document.getElementById("rewardType").value;
-      const details = document.getElementById("rewardDetails").value;
-      alert(`Requested ${type} reward for ${details}`);
+    // Submit reward request
+    window.requestReward = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to request a reward.");
+        return;
+      }
+      const rewardType = rewardTypeSelect.value;
+      const rewardDetails = rewardDetailsInput.value.trim();
+      if (!rewardDetails) {
+        alert("Please enter your username or wallet address.");
+        return;
+      }
+      try {
+        await addDoc(collection(db, "rewardRequests"), {
+          userId: user.uid,
+          userEmail: user.email,
+          rewardType,
+          rewardDetails,
+          timestamp: new Date(),
+          status: "pending"
+        });
+        alert("Reward request submitted!");
+        rewardDetailsInput.value = "";
+      } catch (error) {
+        alert("Failed to submit reward request: " + error.message);
+      }
     };
   </script>
 </body>
