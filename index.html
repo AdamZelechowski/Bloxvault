@@ -16,6 +16,8 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
+    /* NAVBAR - EXACTLY AS YOU GAVE IT */
+    /* (No changes here) */
     .navbar {
       background-color: #2c2c2c;
     }
@@ -37,6 +39,7 @@
       font-weight: bold;
     }
 
+    /* GEMS COUNTER */
     #gemCounter {
       color: #ffbb33;
       font-weight: bold;
@@ -52,6 +55,7 @@
       font-size: 1.3rem;
     }
 
+    /* RGB Chroma for admin panel button (no change) */
     @keyframes rgbChroma {
       0% { background-color: #ff0000; }
       25% { background-color: #00ff00; }
@@ -83,10 +87,14 @@
       color: #000 !important;
     }
 
+    /* --- BOTTOM SECTION FIXES --- */
+
+    /* Container padding */
     .container.py-5 {
       max-width: 1140px;
     }
 
+    /* Dashboard welcome card */
     #dashboard > .card.p-4.mb-4 {
       margin-bottom: 1.5rem;
       background-color: #2c2c2c;
@@ -96,6 +104,7 @@
       text-align: center;
     }
 
+    /* Bottom grid container */
     #extraContent {
       display: flex;
       gap: 20px;
@@ -103,6 +112,7 @@
       justify-content: space-between;
     }
 
+    /* Each box */
     #extraContent > div {
       background: #3a3a3a;
       border: 2px solid #ffbb33;
@@ -114,12 +124,14 @@
       box-sizing: border-box;
     }
 
+    /* Chart canvas container: fixed height */
     #earningsChart {
       width: 100% !important;
       height: 180px !important;
       display: block;
     }
 
+    /* Social media icons styling */
     #extraContent .social-icons {
       display: flex;
       justify-content: center;
@@ -140,6 +152,7 @@
       text-decoration: none;
     }
 
+    /* Headings inside boxes */
     #extraContent h4,
     #extraContent h5 {
       color: #ffbb33;
@@ -148,24 +161,55 @@
       text-align: center;
     }
 
+    /* Paragraph text */
     #extraContent p {
       text-align: center;
       font-size: 1rem;
     }
+
+    /* Top Earners & Quick Stats styles */
+    #topEarners ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    #topEarners ul li {
+      padding: 6px 10px;
+      border-bottom: 1px solid #ffbb33;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    #quickStats div {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
+  <!-- NAVBAR - EXACTLY YOUR ORIGINAL -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
       BloxVault
     </a>
+
     <div class="d-flex ms-auto gap-3 align-items-center" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
+
+      <!-- Gems Counter -->
       <div id="gemCounter" title="Your Gems">
         <i class="bi bi-gem"></i> <span id="gemsCount">0</span>
       </div>
+
+      <!-- Admin Panel Dropdown -->
       <div class="dropdown" id="adminPanelDropdown" style="display: none;">
         <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           Admin Panel
@@ -177,15 +221,24 @@
           <li><a class="dropdown-item" href="#" onclick="adminLookupUser()">User Lookup</a></li>
         </ul>
       </div>
+
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
 
+  <!-- Main Container -->
   <div class="container py-5">
+
+    <!-- AUTH -->
     <div id="auth">
       <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+        <!-- Info Panel -->
         <div class="info-box" style="max-width: 450px;">
-          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" style="height: 60px; display:block; margin-bottom:15px;" />
+          <img
+            src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
+            alt="BloxVault Logo"
+            style="height: 60px; display:block; margin-bottom:15px;"
+          />
           <h2>Welcome to BloxVault!</h2>
           <p><strong>BloxVault</strong> is a free rewards platform where you earn points by completing surveys and offers. Redeem for <strong>Robux, crypto, and more!</strong></p>
           <h5>How It Works:</h5>
@@ -202,48 +255,83 @@
             <li>📈 Growing community of real users</li>
           </ul>
         </div>
+
+        <!-- Login/Register -->
         <div class="card p-4" style="max-width: 400px; width: 100%;">
           <h2 class="text-center mb-4">Login or Register</h2>
+
           <div class="input-group mb-3">
             <i class="bi bi-envelope-fill form-icon"></i>
             <input id="email" type="email" class="form-control" placeholder="Email" />
           </div>
+
           <div class="input-group mb-3">
             <i class="bi bi-lock-fill form-icon"></i>
             <input id="password" type="password" class="form-control" placeholder="Password" />
           </div>
+
           <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
           <button onclick="register()" class="btn btn-outline-light w-100">Register</button>
         </div>
       </div>
     </div>
 
+    <!-- Dashboard -->
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2>Welcome, <span id="userEmail">User</span></h2>
       </div>
+
+      <!-- Bottom content fixed -->
       <div id="extraContent">
+        <!-- Monthly Earnings Chart -->
         <div>
           <h4>Gems Earned This Month</h4>
           <canvas id="earningsChart"></canvas>
         </div>
+
+        <!-- Social Media Links (no links) -->
         <div>
           <h5>Follow Us</h5>
-          <div class="social-icons">
+          <div class="social-icons" aria-label="Social media links">
             <i class="bi bi-twitter" title="Twitter"></i>
             <i class="bi bi-instagram" title="Instagram"></i>
             <i class="bi bi-youtube" title="YouTube"></i>
             <i class="bi bi-discord" title="Discord"></i>
           </div>
         </div>
+
+        <!-- General Info Card -->
         <div>
           <h5>Welcome Back!</h5>
           <p>Complete surveys and offers to earn gems daily. Redeem your gems for Robux, crypto, and more!</p>
           <p><strong>Tip:</strong> Stay active and check back often for new offers and bonuses.</p>
         </div>
+
+        <!-- Top Earners -->
+        <div id="topEarners">
+          <h5>Top Earners</h5>
+          <ul>
+            <li>user1@example.com - 1500 gems</li>
+            <li>user2@example.com - 1200 gems</li>
+            <li>user3@example.com - 1150 gems</li>
+            <li>user4@example.com - 1100 gems</li>
+            <li>user5@example.com - 1000 gems</li>
+          </ul>
+        </div>
+
+        <!-- Quick Stats -->
+        <div id="quickStats">
+          <h5>Quick Stats</h5>
+          <div>Total Users: 2,500</div>
+          <div>Active Today: 350</div>
+          <div>Rewards Redeemed: 1,200</div>
+          <div>Total Gems Earned: 1,000,000</div>
+        </div>
       </div>
     </div>
 
+    <!-- Rewards -->
     <div id="rewards">
       <div class="card p-4">
         <h2 class="text-center mb-4">Request a Reward</h2>
@@ -260,6 +348,7 @@
     </div>
   </div>
 
+  <!-- Firebase + Logic -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import {
@@ -339,13 +428,15 @@
     window.login = () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      signInWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
     window.register = () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+      createUserWithEmailAndPassword(auth, email, password)
+        .catch(err => alert(err.message));
     };
 
     window.logout = () => signOut(auth);
@@ -382,10 +473,10 @@
     const earningsChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array.from({ length: 31 }, (_, i) => `Day ${i + 1}`),
+        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()), // Days 1 to 31
         datasets: [{
           label: 'Gems Earned',
-          data: Array(31).fill(0),
+          data: Array(31).fill(0), // zeroed data
           borderColor: '#ffbb33',
           backgroundColor: 'rgba(255, 187, 51, 0.2)',
           fill: true,
@@ -401,12 +492,24 @@
         scales: {
           y: {
             beginAtZero: true,
-            ticks: { color: '#fff' },
-            grid: { color: '#444' }
+            ticks: {
+              display: true,
+              color: '#ffbb33',
+              font: { weight: 'bold' }
+            },
+            grid: {
+              color: '#444'
+            }
           },
           x: {
-            ticks: { color: '#fff' },
-            grid: { color: '#444' }
+            ticks: {
+              display: true,
+              color: '#ffbb33',
+              font: { weight: 'bold' }
+            },
+            grid: {
+              color: '#444'
+            }
           }
         },
         plugins: {
@@ -421,7 +524,7 @@
     });
   </script>
 
-  <!-- Bootstrap JS Bundle -->
+  <!-- Bootstrap JS Bundle (for dropdown) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
