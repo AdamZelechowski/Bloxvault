@@ -131,27 +131,6 @@
       display: block;
     }
 
-    /* Social media icons styling */
-    #extraContent .social-icons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      font-size: 2rem;
-    }
-
-    #extraContent .social-icons a,
-    #extraContent .social-icons i {
-      color: #fff;
-      cursor: default;
-      text-decoration: none;
-    }
-
-    #extraContent .social-icons a:hover,
-    #extraContent .social-icons i:hover {
-      color: #ffbb33;
-      text-decoration: none;
-    }
-
     /* Headings inside boxes */
     #extraContent h4,
     #extraContent h5 {
@@ -165,30 +144,6 @@
     #extraContent p {
       text-align: center;
       font-size: 1rem;
-    }
-
-    /* Top Earners & Quick Stats styles */
-    #topEarners ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    #topEarners ul li {
-      padding: 6px 10px;
-      border-bottom: 1px solid #ffbb33;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    #quickStats div {
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #fff;
-      text-align: center;
     }
   </style>
 </head>
@@ -290,15 +245,10 @@
           <canvas id="earningsChart"></canvas>
         </div>
 
-        <!-- Social Media Links (no links) -->
+        <!-- Earn Points Box (middle bottom) -->
         <div>
-          <h5>Follow Us</h5>
-          <div class="social-icons" aria-label="Social media links">
-            <i class="bi bi-twitter" title="Twitter"></i>
-            <i class="bi bi-instagram" title="Instagram"></i>
-            <i class="bi bi-youtube" title="YouTube"></i>
-            <i class="bi bi-discord" title="Discord"></i>
-          </div>
+          <h5>Earn Points</h5>
+          <p>This is your offerwall area. Embed surveys, tasks, etc. here.</p>
         </div>
 
         <!-- General Info Card -->
@@ -306,27 +256,6 @@
           <h5>Welcome Back!</h5>
           <p>Complete surveys and offers to earn gems daily. Redeem your gems for Robux, crypto, and more!</p>
           <p><strong>Tip:</strong> Stay active and check back often for new offers and bonuses.</p>
-        </div>
-
-        <!-- Top Earners -->
-        <div id="topEarners">
-          <h5>Top Earners</h5>
-          <ul>
-            <li>user1@example.com - 1500 gems</li>
-            <li>user2@example.com - 1200 gems</li>
-            <li>user3@example.com - 1150 gems</li>
-            <li>user4@example.com - 1100 gems</li>
-            <li>user5@example.com - 1000 gems</li>
-          </ul>
-        </div>
-
-        <!-- Quick Stats -->
-        <div id="quickStats">
-          <h5>Quick Stats</h5>
-          <div>Total Users: 2,500</div>
-          <div>Active Today: 350</div>
-          <div>Rewards Redeemed: 1,200</div>
-          <div>Total Gems Earned: 1,000,000</div>
         </div>
       </div>
     </div>
@@ -473,10 +402,10 @@
     const earningsChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()), // Days 1 to 31
+        labels: Array.from({length: 31}, (_, i) => i + 1), // days 1 to 31
         datasets: [{
           label: 'Gems Earned',
-          data: Array(31).fill(0), // zeroed data
+          data: Array(31).fill(0), // all zeros
           borderColor: '#ffbb33',
           backgroundColor: 'rgba(255, 187, 51, 0.2)',
           fill: true,
@@ -492,23 +421,19 @@
         scales: {
           y: {
             beginAtZero: true,
-            ticks: {
-              display: true,
-              color: '#ffbb33',
-              font: { weight: 'bold' }
-            },
             grid: {
               color: '#444'
+            },
+            ticks: {
+              color: '#ffbb33'
             }
           },
           x: {
-            ticks: {
-              display: true,
-              color: '#ffbb33',
-              font: { weight: 'bold' }
-            },
             grid: {
               color: '#444'
+            },
+            ticks: {
+              color: '#ffbb33'
             }
           }
         },
