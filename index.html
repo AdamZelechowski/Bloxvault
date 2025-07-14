@@ -47,7 +47,7 @@
       user-select: none;
     }
 
-    /* RGB chroma background animation for admin panel */
+    /* RGB chroma animation for entire admin container */
     @keyframes rgbChromaBG {
       0%   { background-color: rgb(255, 0, 0); }
       16%  { background-color: rgb(255, 127, 0); }
@@ -58,19 +58,62 @@
       100% { background-color: rgb(148, 0, 211); }
     }
 
-    #adminDropdownMenu {
-      animation: rgbChromaBG 7s linear infinite;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 10px;
-      color: white;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
-      user-select: none;
-      min-width: 200px;
-    }
-
     #adminPanel {
       position: relative;
+      border-radius: 8px;
+      animation: rgbChromaBG 8s linear infinite;
+      padding: 5px;
+      display: inline-block;
+      user-select: none;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    #adminToggleBtn {
+      color: white !important;
+      font-weight: bold;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px 12px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    #adminToggleBtn:focus {
+      outline: none;
+    }
+
+    #adminDropdownMenu {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease;
+      color: white;
+      padding: 0 12px;
+    }
+
+    #adminDropdownMenu.open {
+      max-height: 300px; /* enough height for content */
+      padding: 10px 12px;
+    }
+
+    #adminDropdownMenu button {
+      background: rgba(255 255 255 / 0.9);
+      border: none;
+      color: #ff7700;
+      font-weight: bold;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #adminDropdownMenu button:hover {
+      background-color: #ffd88c;
     }
 
     .card {
@@ -147,15 +190,15 @@
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
 
-      <!-- Admin dropdown -->
-      <div id="adminPanel" style="position: relative;">
-        <button class="btn btn-link nav-link" id="adminToggleBtn" onclick="toggleAdminPanel()">
+      <!-- Admin dropdown with full chroma background -->
+      <div id="adminPanel" style="display:none;">
+        <button id="adminToggleBtn" onclick="toggleAdminPanel()">
           <i class="bi bi-shield-lock-fill"></i> Admin ▼
         </button>
-        <div id="adminDropdownMenu" style="display:none;">
-          <button class="btn btn-primary w-100 mb-2" onclick="runDiagnostics()">Run Diagnostics</button>
-          <button class="btn btn-primary w-100" onclick="resetUserPoints()">Reset User Points</button>
-          <!-- Logout button REMOVED as requested -->
+        <div id="adminDropdownMenu">
+          <button onclick="runDiagnostics()">Run Diagnostics</button>
+          <button onclick="resetUserPoints()">Reset User Points</button>
+          <!-- Logout removed as requested -->
         </div>
       </div>
     </div>
@@ -215,7 +258,6 @@
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
-        <!-- No gem counter here, per your request -->
       </div>
 
       <div class="card p-4">
@@ -284,18 +326,19 @@
     const authDiv = document.getElementById("auth");
     const dashboardDiv = document.getElementById("dashboard");
     const rewardsDiv = document.getElementById("rewards");
+    const adminPanel = document.getElementById("adminPanel");
     const adminDropdown = document.getElementById("adminDropdownMenu");
 
-    // Show/hide admin dropdown
+    // Toggle dropdown with slide effect
     window.toggleAdminPanel = () => {
-      if (adminDropdown.style.display === "block") {
-        adminDropdown.style.display = "none";
+      if (adminDropdown.classList.contains("open")) {
+        adminDropdown.classList.remove("open");
       } else {
-        adminDropdown.style.display = "block";
+        adminDropdown.classList.add("open");
       }
     };
 
-    // Run diagnostics (simple example)
+    // Run diagnostics (simple alert example)
     window.runDiagnostics = () => {
       alert("Diagnostics check: All systems operational!");
     };
@@ -318,9 +361,9 @@
 
         // Show admin panel only for your email
         if (user.email === "zelechowskiadam3@gmail.com") {
-          document.getElementById("adminPanel").style.display = "block";
+          adminPanel.style.display = "inline-block";
         } else {
-          document.getElementById("adminPanel").style.display = "none";
+          adminPanel.style.display = "none";
         }
 
         // Fetch user gems
@@ -341,7 +384,7 @@
       }
 
       document.body.style.display = "block";
-      adminDropdown.style.display = "none"; // hide admin menu on logout
+      adminDropdown.classList.remove("open"); // hide admin menu on logout
     });
 
     // Login function
@@ -367,14 +410,14 @@
     window.showDashboard = () => {
       dashboardDiv.style.display = "block";
       rewardsDiv.style.display = "none";
-      adminDropdown.style.display = "none";
+      adminDropdown.classList.remove("open");
     };
 
     // Show rewards page
     window.showRewards = () => {
       dashboardDiv.style.display = "none";
       rewardsDiv.style.display = "block";
-      adminDropdown.style.display = "none";
+      adminDropdown.classList.remove("open");
     };
 
     // Submit reward request
