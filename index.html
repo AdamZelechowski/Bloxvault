@@ -16,6 +16,8 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
+    /* NAVBAR - EXACTLY AS YOU GAVE IT */
+    /* (No changes here) */
     .navbar {
       background-color: #2c2c2c;
     }
@@ -37,61 +39,23 @@
       font-weight: bold;
     }
 
-    .info-box {
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      color: #333;
-    }
-
-    .card {
-      background-color: #2c2c2c;
-      border: 2px solid #fff;
-      border-radius: 10px;
-      color: #fff;
-    }
-
-    .btn-primary {
-      background-color: #fff;
-      color: #ff7700;
+    /* GEMS COUNTER */
+    #gemCounter {
+      color: #ffbb33;
       font-weight: bold;
-      border: none;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
     }
 
-    .btn-primary:hover {
-      background-color: #f2f2f2;
+    #gemCounter i {
+      color: #ffbb33;
+      font-size: 1.3rem;
     }
 
-    input.form-control,
-    select.form-select {
-      background-color: #3a3a3a;
-      color: #fff;
-      border: 2px solid #fff;
-    }
-
-    h1, h2, h4, h5 {
-      color: #fff;
-    }
-
-    #dashboard, #rewards {
-      display: none;
-    }
-
-    .form-icon {
-      position: absolute;
-      left: 12px;
-      top: 10px;
-      color: #aaa;
-    }
-
-    .input-group {
-      position: relative;
-    }
-
-    .input-group input {
-      padding-left: 36px;
-    }
-
+    /* RGB Chroma for admin panel button (no change) */
     @keyframes rgbChroma {
       0% { background-color: #ff0000; }
       25% { background-color: #00ff00; }
@@ -107,7 +71,6 @@
       border: none;
     }
 
-    /* Admin dropdown menu fixes */
     #adminPanelDropdown .dropdown-menu {
       background-color: #222 !important;
       border: 1px solid #fff !important;
@@ -124,37 +87,60 @@
       color: #000 !important;
     }
 
-    /* Gems counter in navbar */
-    #gemCounter {
-      color: #ffbb33;
-      font-weight: bold;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      user-select: none;
-    }
+    /* --- BOTTOM SECTION FIXES --- */
 
-    #gemCounter i {
-      color: #ffbb33;
-      font-size: 1.3rem;
-    }
-
-    /* Layout below navbar */
-    .container.py-4 {
+    /* Container padding */
+    .container.py-5 {
       max-width: 1140px;
     }
 
-    /* Cards and sections below navbar */
-    #extraContent .card {
-      border-color: #ffbb33;
+    /* Dashboard welcome card */
+    #dashboard > .card.p-4.mb-4 {
+      margin-bottom: 1.5rem;
+      background-color: #2c2c2c;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      color: #fff;
+      text-align: center;
     }
 
-    /* Social media icons */
+    /* Bottom grid container */
+    #extraContent {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    /* Each box */
+    #extraContent > div {
+      background: #3a3a3a;
+      border: 2px solid #ffbb33;
+      border-radius: 10px;
+      color: white;
+      padding: 20px;
+      flex: 1 1 300px;
+      max-width: 350px;
+      box-sizing: border-box;
+    }
+
+    /* Chart canvas container: fixed height */
+    #earningsChart {
+      width: 100% !important;
+      height: 180px !important;
+      display: block;
+    }
+
+    /* Social media icons styling */
+    #extraContent .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      font-size: 2rem;
+    }
+
     #extraContent .social-icons a {
       color: #fff;
-      font-size: 2rem;
-      margin: 0 10px;
       transition: color 0.3s ease;
     }
 
@@ -162,10 +148,25 @@
       color: #ffbb33;
       text-decoration: none;
     }
+
+    /* Headings inside boxes */
+    #extraContent h4,
+    #extraContent h5 {
+      color: #ffbb33;
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Paragraph text */
+    #extraContent p {
+      text-align: center;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
+  <!-- NAVBAR - EXACTLY YOUR ORIGINAL -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
@@ -251,37 +252,33 @@
     <!-- Dashboard -->
     <div id="dashboard">
       <div class="card p-4 mb-4">
-        <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
+        <h2>Welcome, <span id="userEmail">User</span></h2>
       </div>
 
-      <!-- Extra content below navbar -->
-      <div id="extraContent" class="container py-4">
-        <div class="row gy-4">
+      <!-- Bottom content fixed -->
+      <div id="extraContent">
+        <!-- Monthly Earnings Chart -->
+        <div>
+          <h4>Gems Earned This Month</h4>
+          <canvas id="earningsChart"></canvas>
+        </div>
 
-          <!-- Monthly Earnings Chart -->
-          <div class="col-md-6" style="background:#3a3a3a; border-radius:10px; padding:20px; border: 2px solid #ffbb33;">
-            <h4 class="text-warning mb-3">Gems Earned This Month</h4>
-            <canvas id="earningsChart" height="200"></canvas>
+        <!-- Social Media Links -->
+        <div>
+          <h5>Follow Us</h5>
+          <div class="social-icons" aria-label="Social media links">
+            <a href="https://twitter.com/BloxVault" target="_blank" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
+            <a href="https://instagram.com/BloxVault" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://youtube.com/BloxVault" target="_blank" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+            <a href="https://discord.gg/BloxVault" target="_blank" aria-label="Discord"><i class="bi bi-discord"></i></a>
           </div>
+        </div>
 
-          <!-- Social Media Links -->
-          <div class="col-md-3 d-flex flex-column align-items-center justify-content-center" aria-label="Social media links">
-            <h5 class="text-warning mb-3">Follow Us</h5>
-            <div class="social-icons">
-              <a href="https://twitter.com/BloxVault" target="_blank" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
-              <a href="https://instagram.com/BloxVault" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-              <a href="https://youtube.com/BloxVault" target="_blank" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
-              <a href="https://discord.gg/BloxVault" target="_blank" aria-label="Discord"><i class="bi bi-discord"></i></a>
-            </div>
-          </div>
-
-          <!-- General Info Card -->
-          <div class="col-md-3" style="background:#3a3a3a; border-radius:10px; padding:25px; border: 2px solid #ffbb33; color:#fff;">
-            <h5 class="text-warning mb-3">Welcome Back!</h5>
-            <p>Complete surveys and offers to earn gems daily. Redeem your gems for Robux, crypto, and more!</p>
-            <p><strong>Tip:</strong> Stay active and check back often for new offers and bonuses.</p>
-          </div>
-
+        <!-- General Info Card -->
+        <div>
+          <h5>Welcome Back!</h5>
+          <p>Complete surveys and offers to earn gems daily. Redeem your gems for Robux, crypto, and more!</p>
+          <p><strong>Tip:</strong> Stay active and check back often for new offers and bonuses.</p>
         </div>
       </div>
     </div>
@@ -332,7 +329,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Update UI and gems count on auth change
     onAuthStateChanged(auth, async (user) => {
       const authUI = document.getElementById("auth");
       const navbar = document.getElementById("topNavbar");
@@ -347,7 +343,6 @@
         if (dash) dash.style.display = "block";
         if (rewards) rewards.style.display = "none";
 
-        // Show admin panel only for specified email
         if (adminPanel) {
           if (user.email === "zelechowskiadam3@gmail.com") {
             adminPanel.style.display = "block";
@@ -358,7 +353,6 @@
 
         document.getElementById("userEmail").textContent = user.email;
 
-        // Fetch gems from Firestore
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
@@ -409,7 +403,6 @@
       document.getElementById("rewards").style.display = "block";
     };
 
-    // Admin panel functions (placeholders)
     window.viewUsers = () => alert("View users function placeholder");
     window.viewRewardRequests = () => alert("View reward requests function placeholder");
     window.runDiagnostics = () => alert("Run diagnostics function placeholder");
@@ -418,7 +411,6 @@
       if (email) alert("Looking up user: " + email);
     };
 
-    // Reward request (simple alert placeholder)
     window.requestReward = () => {
       const type = document.getElementById("rewardType").value;
       const details = document.getElementById("rewardDetails").value;
@@ -428,9 +420,7 @@
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <script>
-    // Setup chart for monthly gems earned
     const ctx = document.getElementById('earningsChart').getContext('2d');
     const earningsChart = new Chart(ctx, {
       type: 'line',
