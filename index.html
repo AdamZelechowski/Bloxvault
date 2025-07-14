@@ -139,12 +139,15 @@
       font-size: 2rem;
     }
 
-    #extraContent .social-icons a {
+    #extraContent .social-icons a,
+    #extraContent .social-icons i {
       color: #fff;
-      transition: color 0.3s ease;
+      cursor: default;
+      text-decoration: none;
     }
 
-    #extraContent .social-icons a:hover {
+    #extraContent .social-icons a:hover,
+    #extraContent .social-icons i:hover {
       color: #ffbb33;
       text-decoration: none;
     }
@@ -263,14 +266,14 @@
           <canvas id="earningsChart"></canvas>
         </div>
 
-        <!-- Social Media Links -->
+        <!-- Social Media Links (no links) -->
         <div>
           <h5>Follow Us</h5>
           <div class="social-icons" aria-label="Social media links">
-            <a href="https://twitter.com/BloxVault" target="_blank" aria-label="Twitter"><i class="bi bi-twitter"></i></a>
-            <a href="https://instagram.com/BloxVault" target="_blank" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-            <a href="https://youtube.com/BloxVault" target="_blank" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
-            <a href="https://discord.gg/BloxVault" target="_blank" aria-label="Discord"><i class="bi bi-discord"></i></a>
+            <i class="bi bi-twitter" title="Twitter"></i>
+            <i class="bi bi-instagram" title="Instagram"></i>
+            <i class="bi bi-youtube" title="YouTube"></i>
+            <i class="bi bi-discord" title="Discord"></i>
           </div>
         </div>
 
@@ -425,7 +428,7 @@
     const earningsChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'],
+        labels: Array(31).fill(''), // 31 empty labels (no X-axis values)
         datasets: [{
           label: 'Gems Earned',
           data: [5, 8, 12, 20, 18, 25, 30, 28, 32, 35, 40, 38, 36, 34, 30, 33, 35, 40, 42, 45, 47, 50, 52, 55, 57, 60, 65, 70, 68, 72, 75],
@@ -445,8 +448,7 @@
           y: {
             beginAtZero: true,
             ticks: {
-              color: '#ffbb33',
-              font: { weight: 'bold' }
+              display: false // hide Y axis values
             },
             grid: {
               color: '#444'
@@ -454,8 +456,7 @@
           },
           x: {
             ticks: {
-              color: '#ffbb33',
-              font: { weight: 'bold' }
+              display: false // hide X axis values
             },
             grid: {
               color: '#444'
