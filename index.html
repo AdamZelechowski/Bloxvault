@@ -37,24 +37,16 @@
       font-weight: bold;
     }
 
-    /* New gem counter style */
-    #gemCounter {
-      color: white;
+    /* Gem counter styling in navbar */
+    #gemCounterNav {
+      color: #ffbb33;
       font-weight: bold;
-      font-size: 1rem;
-      user-select: none;
-      margin-left: 15px;
+      font-size: 1.1rem;
       display: flex;
       align-items: center;
-      text-shadow:
-        0 0 5px #ff7700,
-        0 0 10px #ff7700,
-        0 0 20px #ff7700;
-    }
-
-    #gemCounter i {
-      margin-right: 6px;
-      color: #fff8cc;
+      gap: 6px;
+      margin-left: 15px;
+      user-select: none;
     }
 
     .info-box {
@@ -140,6 +132,54 @@
       background-color: #ff7700;
       color: #000;
     }
+
+    /* New UI section below navbar */
+    #userSummarySection {
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #userSummarySection .card {
+      border-color: #ff7700;
+      background-color: #3a3a3a;
+      color: #ffbb33;
+    }
+
+    #userSummarySection h4 {
+      color: #ffbb33;
+      margin-bottom: 10px;
+    }
+
+    #userSummarySection .progress {
+      border-radius: 10px;
+      height: 12px;
+    }
+
+    #userSummarySection .progress-bar {
+      background-color: #ff7700;
+    }
+
+    #userSummarySection button.btn-warning {
+      background-color: #ff7700;
+      border: none;
+      font-weight: bold;
+    }
+
+    #userSummarySection button.btn-warning:hover {
+      background-color: #ffaa33;
+    }
+
+    #userSummarySection button.btn-outline-warning {
+      color: #ff7700;
+      border-color: #ff7700;
+      font-weight: bold;
+    }
+
+    #userSummarySection button.btn-outline-warning:hover {
+      background-color: #ff7700;
+      color: #fff;
+    }
+
   </style>
 </head>
 <body>
@@ -152,8 +192,8 @@
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
       <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
 
-      <!-- Gem Counter -->
-      <div id="gemCounter"><i class="bi bi-gem"></i>0 Gems</div>
+      <!-- Gem counter in navbar -->
+      <div id="gemCounterNav" title="Your Gems">💎 <span id="navGemCount">0</span></div>
 
       <!-- Admin Panel Dropdown -->
       <div class="dropdown" id="adminPanelDropdown" style="display: none;">
@@ -171,6 +211,27 @@
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
+
+  <!-- New UI section with user gems summary and quick actions -->
+  <div class="container" id="userSummarySection">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card p-4 text-center">
+          <h4>Your Gems</h4>
+          <div id="userGemsLarge" style="font-size: 2.5rem; font-weight: bold; color: #ffbb33;">💎 0</div>
+          <div class="progress mt-3" role="progressbar" aria-label="Progress to next reward tier" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
+          </div>
+          <small id="progressText" style="color: #ffbb33;">0% to next reward tier</small>
+        </div>
+      </div>
+      <div class="col-md-6 d-flex flex-column justify-content-center gap-3">
+        <button class="btn btn-warning btn-lg" onclick="showRewards()">Redeem Rewards</button>
+        <button class="btn btn-outline-warning btn-lg" onclick="alert('Earn More Gems feature coming soon!')">Earn More Gems</button>
+        <button class="btn btn-outline-light btn-lg" onclick="alert('Invite friends feature coming soon!')">Invite Friends</button>
+      </div>
+    </div>
+  </div>
 
   <div class="container py-5">
     <!-- AUTH -->
@@ -224,7 +285,6 @@
     <div id="dashboard">
       <div class="card p-4 mb-4">
         <h2 class="text-center">Welcome, <span id="userEmail">User</span></h2>
-        <p class="text-center">Points: <span id="points">0</span></p>
       </div>
 
       <div class="card p-4">
@@ -260,6 +320,11 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -272,14 +337,15 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
+    // Update UI on auth state change
+    onAuthStateChanged(auth, async (user) => {
       const authUI = document.getElementById("auth");
       const navbar = document.getElementById("topNavbar");
       const dash = document.getElementById("dashboard");
       const rewards = document.getElementById("rewards");
       const adminPanel = document.getElementById("adminPanelDropdown");
-      const gemCounter = document.getElementById("gemCounter");
 
       if (user) {
         if (authUI) authUI.style.display = "none";
@@ -297,15 +363,46 @@
 
         document.getElementById("userEmail").textContent = user.email;
 
-        // Example: update gem counter to 100 (you'll replace this with your actual data fetching)
-        if (gemCounter) gemCounter.textContent = "💎 100 Gems";
+        // Load gems from Firestore users collection
+        const userDocRef = doc(db, "users", user.uid);
+        try {
+          const userDocSnap = await getDoc(userDocRef);
+          let gems = 0;
+          if (userDocSnap.exists()) {
+            gems = userDocSnap.data().points || 0;
+          }
+          // Update gem counters
+          document.getElementById("navGemCount").textContent = gems;
+          document.getElementById("userGemsLarge").textContent = "💎 " + gems;
+
+          // Simple progress example: show % to next 100 gems tier
+          const progressPercent = Math.min((gems % 100), 100);
+          const progressBar = document.querySelector("#userSummarySection .progress-bar");
+          const progressText = document.getElementById("progressText");
+          if (progressBar && progressText) {
+            progressBar.style.width = progressPercent + "%";
+            progressText.textContent = progressPercent + "% to next reward tier";
+          }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+        }
+
       } else {
         if (authUI) authUI.style.display = "block";
         if (navbar) navbar.style.display = "none";
         if (dash) dash.style.display = "none";
         if (rewards) rewards.style.display = "none";
         if (adminPanel) adminPanel.style.display = "none";
-        if (gemCounter) gemCounter.textContent = "💎 0 Gems";
+
+        // Reset gem counters on logout
+        document.getElementById("navGemCount").textContent = "0";
+        document.getElementById("userGemsLarge").textContent = "💎 0";
+        const progressBar = document.querySelector("#userSummarySection .progress-bar");
+        const progressText = document.getElementById("progressText");
+        if (progressBar && progressText) {
+          progressBar.style.width = "0%";
+          progressText.textContent = "0% to next reward tier";
+        }
       }
 
       document.body.style.display = "block";
