@@ -191,14 +191,14 @@
       text-align: center;
     }
 
-    /* ------------------- LOGIN PAGE IMPROVEMENTS ------------------- */
+    /* ------------------- LOGIN PAGE IMPROVEMENTS & CENTERING ------------------- */
 
     #auth {
       min-height: 80vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px 0;
+      padding: 20px;
     }
 
     .auth-container {
@@ -209,6 +209,12 @@
       max-width: 900px;
       width: 100%;
       gap: 40px !important;
+
+      /* Center horizontally and vertically */
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      flex-wrap: wrap;
     }
 
     .info-box {
@@ -217,6 +223,8 @@
       border-radius: 12px;
       box-shadow: inset 0 0 15px rgba(255, 187, 51, 0.25);
       color: #fff;
+      flex: 1 1 400px;
+      max-width: 450px;
     }
 
     .info-box h2 {
@@ -244,6 +252,8 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       border: 2px solid #ffbb33 !important;
       padding: 30px !important;
+      flex: 1 1 350px;
+      max-width: 400px;
     }
 
     .card.p-4 h2 {
@@ -369,7 +379,6 @@
       box-shadow: 0 0 10px #c9302caa;
       outline: none;
     }
-
   </style>
 </head>
 <body>
@@ -411,9 +420,9 @@
 
     <!-- AUTH -->
     <div id="auth">
-      <div class="d-flex auth-container gap-4 justify-content-center align-items-center flex-wrap">
+      <div class="auth-container">
         <!-- Info Panel -->
-        <div class="info-box" style="max-width: 450px;">
+        <div class="info-box">
           <img
             src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png"
             alt="BloxVault Logo"
@@ -437,7 +446,7 @@
         </div>
 
         <!-- Login/Register -->
-        <div class="card p-4" style="max-width: 400px; width: 100%;">
+        <div class="card p-4">
           <h2 class="text-center mb-4">Login or Register</h2>
 
           <div class="input-group mb-3">
@@ -681,10 +690,10 @@
     const earningsChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()), // Days 1 to 31
+        labels: Array.from({length: 31}, (_, i) => (i + 1).toString()),
         datasets: [{
           label: 'Gems Earned',
-          data: Array(31).fill(0), // zeroed data
+          data: Array(31).fill(0),
           borderColor: '#ffbb33',
           backgroundColor: 'rgba(255, 187, 51, 0.2)',
           fill: true,
@@ -700,39 +709,22 @@
         scales: {
           y: {
             beginAtZero: true,
-            ticks: {
-              display: true,
-              color: '#ffbb33',
-              font: { weight: 'bold' }
-            },
-            grid: {
-              color: '#444'
-            }
+            ticks: { display: true, color: '#ffbb33', font: { weight: 'bold' } },
+            grid: { color: '#444' }
           },
           x: {
-            ticks: {
-              display: true,
-              color: '#ffbb33',
-              font: { weight: 'bold' }
-            },
-            grid: {
-              color: '#444'
-            }
+            ticks: { display: true, color: '#ffbb33', font: { weight: 'bold' } },
+            grid: { color: '#444' }
           }
         },
         plugins: {
-          legend: {
-            labels: {
-              color: '#ffbb33',
-              font: { weight: 'bold' }
-            }
-          }
+          legend: { labels: { color: '#ffbb33', font: { weight: 'bold' } } }
         }
       }
     });
   </script>
 
-  <!-- Bootstrap JS Bundle (for dropdown) -->
+  <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
