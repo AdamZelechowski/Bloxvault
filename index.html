@@ -22,12 +22,11 @@
     #adminPanelDropdown .dropdown-menu { background-color: #222 !important; border: 1px solid #fff !important; min-width: 200px; }
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
-    #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg px-3" id="topNavbar">
+  <nav class="navbar navbar-expand-lg px-3" id="topNavbar" style="display: none;">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
       BloxVault
@@ -51,8 +50,19 @@
 
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
-    <!-- ✅ DASHBOARD (Restored) -->
-    <div id="dashboard">
+    <!-- AUTH SECTION (login/register) -->
+    <div id="auth" class="text-center">
+      <h2 class="mb-3">Login to BloxVault</h2>
+      <input id="email" type="email" class="form-control mb-2" placeholder="Email" />
+      <input id="password" type="password" class="form-control mb-2" placeholder="Password" />
+      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
+      <button onclick="register()" class="btn btn-secondary w-100 mb-2">Register</button>
+      <button onclick="googleLogin()" class="btn btn-danger w-100 mb-2"><i class="bi bi-google"></i> Google Login</button>
+      <button onclick="forgotPassword()" class="btn btn-link">Forgot Password?</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" style="display: none;">
       <div class="card p-4 mb-4">
         <h2>Welcome, <span id="userEmail">User</span></h2>
       </div>
@@ -62,7 +72,7 @@
       </div>
     </div>
 
-    <!-- ✅ REWARDS -->
+    <!-- REWARDS -->
     <div id="rewards" style="display: none;">
       <div class="card p-4">
         <h2 class="text-center mb-4">Request a Reward</h2>
@@ -77,18 +87,18 @@
         <button onclick="requestReward()" class="btn btn-primary w-100">Submit</button>
       </div>
 
-      <!-- ✅ Earn Gems Offerwall -->
+      <!-- Offerwall -->
       <div class="card p-4 mt-4">
         <h2 class="text-center mb-4">Earn Gems</h2>
         <p class="text-center">Complete surveys & offers to earn gems instantly! Check back daily for new offers.</p>
         <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-          <iframe id="offerwallFrame" src=""></iframe>
+          <iframe id="offerwallFrame"></iframe>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ✅ FIREBASE + LOGIC -->
+  <!-- FIREBASE + LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
@@ -114,6 +124,7 @@
       const rewards = document.getElementById("rewards");
       const adminPanel = document.getElementById("adminPanelDropdown");
       const gemsCountSpan = document.getElementById("gemsCount");
+      const userEmailSpan = document.getElementById("userEmail");
 
       if (user) {
         if (authUI) authUI.style.display = "none";
@@ -121,14 +132,14 @@
         dash.style.display = "block";
         rewards.style.display = "none";
         adminPanel.style.display = (user.email === "zelechowskiadam3@gmail.com") ? "block" : "none";
-        document.getElementById("userEmail").textContent = user.email;
+        if (userEmailSpan) userEmailSpan.textContent = user.email;
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
         } catch { gemsCountSpan.textContent = "0"; }
 
-        loadOfferwall(user); // ✅ Load Offerwall
+        loadOfferwall(user);
       } else {
         if (authUI) authUI.style.display = "block";
         navbar.style.display = "none";
@@ -140,15 +151,13 @@
       document.body.style.display = "block";
     });
 
-    // ✅ Load Offerwall
     window.loadOfferwall = (user) => {
       const iframe = document.getElementById("offerwallFrame");
       if (!iframe) return;
-      const appId = "YOUR_OFFERWALL_APP_ID"; // Replace with real ID
+      const appId = "YOUR_OFFERWALL_APP_ID";
       iframe.src = `https://www.offertoro.com/ifr/show/${appId}/${user.uid}/desktop`;
     };
 
-    // Existing login, register, etc.
     window.login = () => { const email = document.getElementById("email").value; const password = document.getElementById("password").value; signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message)); };
     window.register = () => { const email = document.getElementById("email").value; const password = document.getElementById("password").value; createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message)); };
     window.logout = () => signOut(auth);
