@@ -83,25 +83,18 @@
       color: #000 !important;
     }
 
-    /* Container */
-    .container.py-5 {
+    /* Styled Login card only */
+    #auth .card {
       max-width: 480px;
-      padding-bottom: 20px;
-      margin-top: 50px;
-    }
-
-    /* Card style for content sections */
-    .card {
+      margin: 50px auto 40px;
       background-color: #2c2c2c;
       border: 2px solid #fff;
       border-radius: 12px;
       padding: 30px 35px;
-      margin-bottom: 25px;
       box-shadow: 0 0 15px rgba(0,0,0,0.4);
       color: #fff;
     }
 
-    /* Inputs and buttons */
     input.form-control, select.form-select {
       background-color: #444;
       border: 1px solid #666;
@@ -166,30 +159,12 @@
       text-decoration: underline;
     }
 
-    /* Header styles */
-    h1, h2 {
+    /* Header styles for login */
+    #auth h2 {
       font-weight: 700;
       margin-bottom: 20px;
       text-align: center;
     }
-    h2 {
-      margin-bottom: 30px;
-    }
-
-    /* Offerwall iframe */
-    #offerwallFrame {
-      width: 100%;
-      height: 600px;
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(255, 187, 51, 0.7);
-    }
-
-    /* Center the auth card */
-    #auth {
-      margin-top: 50px;
-    }
-
   </style>
 </head>
 <body>
@@ -218,10 +193,10 @@
   </nav>
 
   <!-- MAIN CONTAINER -->
-  <div class="container py-5">
+  <div class="container py-5" style="max-width: 960px;">
     <!-- AUTH SECTION -->
     <div id="auth">
-      <div class="card mx-auto">
+      <div class="card">
         <h2>Login or Register</h2>
         <input id="email" type="email" placeholder="Email" class="form-control mb-3" autocomplete="username" />
         <input id="password" type="password" placeholder="Password" class="form-control mb-3" autocomplete="current-password" />
@@ -236,36 +211,33 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
-      <div class="card">
-        <h1>Welcome to your Dashboard!</h1>
-        <p class="text-center">Here you can track your gems, rewards, and stats.</p>
-        <!-- Add more dashboard content as needed -->
-      </div>
+      <!-- Original content reverted -->
+      <h1>Welcome to your Dashboard!</h1>
+      <p>Some stats, info, etc.</p>
+      <!-- Other cards or sections you have on the dashboard -->
     </div>
 
     <!-- REDEEM PAGE -->
     <div id="redeem" style="display:none;">
-      <div class="card">
-        <h2 class="text-center mb-4">🎁 Redeem Your Gems</h2>
-        <p class="text-center mb-4">Exchange your gems for Robux, crypto, and more!</p>
-        <div class="mb-3">
-          <label for="rewardType" class="form-label">Choose a Reward</label>
-          <select id="rewardType" class="form-select">
-            <option>Robux</option>
-            <option>Crypto</option>
-          </select>
-        </div>
-        <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" />
-        <button onclick="requestReward()" class="btn btn-primary w-100">Submit Request</button>
+      <h2 class="text-center mb-4">🎁 Redeem Your Gems</h2>
+      <p class="text-center">Exchange your gems for Robux, crypto, and more!</p>
+      <div class="mb-3" style="max-width: 480px; margin: 0 auto;">
+        <label for="rewardType" class="form-label">Choose a Reward</label>
+        <select id="rewardType" class="form-select">
+          <option>Robux</option>
+          <option>Crypto</option>
+        </select>
       </div>
+      <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" style="max-width: 480px; margin: 0 auto; display: block;" />
+      <button onclick="requestReward()" class="btn btn-primary w-100" style="max-width: 480px; margin: 0 auto; display: block;">Submit Request</button>
     </div>
 
     <!-- EARN PAGE -->
     <div id="earn" style="display:none;">
-      <div class="card">
-        <h2 class="text-center mb-4">💎 Earn Gems</h2>
-        <p class="text-center mb-4">Complete surveys & offers to earn gems instantly!</p>
-        <iframe id="offerwallFrame" src="" title="Offerwall"></iframe>
+      <h2 class="text-center mb-4">💎 Earn Gems</h2>
+      <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
+      <div style="width: 100%; height: 600px; border: 2px solid #ffbb33; border-radius: 10px; overflow: hidden;">
+        <iframe id="offerwallFrame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
       </div>
     </div>
   </div>
