@@ -23,9 +23,6 @@
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
 
-    /* Dashboard & Redeem & Earn styling (simplified for brevity) */
-    /* ... */
-
     /* Offerwall container */
     #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
@@ -58,15 +55,15 @@
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
 
-    <!-- AUTH SECTION -->
-    <div id="auth" class="mx-auto my-5" style="max-width: 400px; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    <!-- LOGIN / REGISTER PAGE -->
+    <div id="auth" class="mx-auto my-5" style="max-width: 400px; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); color: #333;">
       <h2 class="text-center mb-4" style="font-weight: 700; color: #ff7700;">Welcome Back!</h2>
       <div class="mb-3">
-        <label for="email" class="form-label">Email address</label>
+        <label for="email" class="form-label" style="color:#000;">Email address</label>
         <input id="email" type="email" placeholder="Enter your email" class="form-control" />
       </div>
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label" style="color:#000;">Password</label>
         <input id="password" type="password" placeholder="Enter your password" class="form-control" />
       </div>
       <button class="btn btn-primary w-100 mb-3" onclick="login()">Login</button>
@@ -81,10 +78,33 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
-      <!-- Your existing dashboard content here -->
       <h1>Welcome to your Dashboard!</h1>
-      <p>Some stats, info, etc.</p>
-      <!-- Other cards or sections you have on the dashboard -->
+      <div class="row g-3 mt-3">
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Total Gems</h5>
+              <p class="card-text" id="totalGems">0</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Redeemed Rewards</h5>
+              <p class="card-text" id="redeemedRewards">0</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Pending Requests</h5>
+              <p class="card-text" id="pendingRequests">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- REDEEM PAGE -->
@@ -143,6 +163,9 @@
     const adminPanel = document.getElementById("adminPanelDropdown");
     const gemsCountSpan = document.getElementById("gemsCount");
     const userEmailDisplay = document.getElementById("userEmail");
+    const totalGemsDisplay = document.getElementById("totalGems");
+    const redeemedRewardsDisplay = document.getElementById("redeemedRewards");
+    const pendingRequestsDisplay = document.getElementById("pendingRequests");
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -156,9 +179,19 @@
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
-          gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
+          const points = userDoc.exists() ? (userDoc.data().points || 0) : 0;
+          const redeemed = userDoc.exists() ? (userDoc.data().redeemed || 0) : 0;
+          const pending = userDoc.exists() ? (userDoc.data().pendingRequests || 0) : 0;
+
+          gemsCountSpan.textContent = points;
+          totalGemsDisplay.textContent = points;
+          redeemedRewardsDisplay.textContent = redeemed;
+          pendingRequestsDisplay.textContent = pending;
         } catch {
           gemsCountSpan.textContent = "0";
+          totalGemsDisplay.textContent = "0";
+          redeemedRewardsDisplay.textContent = "0";
+          pendingRequestsDisplay.textContent = "0";
         }
 
         loadOfferwall(user);
@@ -171,6 +204,9 @@
         if(adminPanel) adminPanel.style.display = "none";
         if(gemsCountSpan) gemsCountSpan.textContent = "0";
         if(userEmailDisplay) userEmailDisplay.textContent = "";
+        if(totalGemsDisplay) totalGemsDisplay.textContent = "0";
+        if(redeemedRewardsDisplay) redeemedRewardsDisplay.textContent = "0";
+        if(pendingRequestsDisplay) pendingRequestsDisplay.textContent = "0";
       }
       document.body.style.display = "block";
     });
