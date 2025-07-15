@@ -31,7 +31,7 @@
   </style>
 </head>
 <body>
-  <!-- NAVBAR (replaced with your given navbar) -->
+  <!-- NAVBAR -->
   <nav class="navbar navbar-expand-lg px-3" id="topNavbar" style="display:none;">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
@@ -57,17 +57,26 @@
 
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
-    <!-- AUTH SECTION (unchanged, assumed existing in your full code) -->
-    <div id="auth">
-      <!-- Your existing login/register UI here -->
-      <!-- Example (simplified): -->
-      <h2>Login or Register</h2>
-      <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
-      <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
-      <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
-      <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-      <button class="btn btn-link w-100" onclick="forgotPassword()">Forgot Password?</button>
-      <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()">Sign in with Google</button>
+
+    <!-- AUTH SECTION -->
+    <div id="auth" class="mx-auto my-5" style="max-width: 400px; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+      <h2 class="text-center mb-4" style="font-weight: 700; color: #ff7700;">Welcome Back!</h2>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input id="email" type="email" placeholder="Enter your email" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" placeholder="Enter your password" class="form-control" />
+      </div>
+      <button class="btn btn-primary w-100 mb-3" onclick="login()">Login</button>
+      <button class="btn btn-secondary w-100 mb-3" onclick="register()">Register</button>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <button class="btn btn-link p-0" onclick="forgotPassword()" style="color:#ff7700;">Forgot Password?</button>
+        <button class="btn btn-danger" style="font-weight: 600;" onclick="googleLogin()">
+          <i class="bi bi-google"></i> Sign in with Google
+        </button>
+      </div>
     </div>
 
     <!-- DASHBOARD -->
