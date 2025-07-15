@@ -22,18 +22,25 @@
     #adminPanelDropdown .dropdown-menu { background-color: #222 !important; border: 1px solid #fff !important; min-width: 200px; }
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
+
+    /* Dashboard & Redeem & Earn styling (simplified for brevity) */
+    /* ... */
+
+    /* Offerwall container */
+    #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar navbar-expand-lg px-3" id="topNavbar" style="display: none;">
+  <nav class="navbar navbar-expand-lg px-3" id="topNavbar" style="display:none;">
     <a class="navbar-brand" href="#">
       <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="Logo" />
       BloxVault
     </a>
     <div class="d-flex ms-auto gap-3 align-items-center" id="navButtons">
       <button class="btn btn-link nav-link" onclick="showDashboard()"><i class="bi bi-house-door-fill"></i> Home</button>
-      <button class="btn btn-link nav-link" onclick="showRewards()"><i class="bi bi-gift-fill"></i> Rewards</button>
+      <button class="btn btn-link nav-link" onclick="showRedeem()"><i class="bi bi-gift-fill"></i> Redeem</button>
+      <button class="btn btn-link nav-link" onclick="showEarn()"><i class="bi bi-cash-coin"></i> Earn</button>
       <div id="gemCounter" title="Your Gems"><i class="bi bi-gem"></i> <span id="gemsCount">0</span></div>
       <div class="dropdown" id="adminPanelDropdown" style="display: none;">
         <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown">Admin Panel</button>
@@ -50,32 +57,32 @@
 
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
-    <!-- AUTH SECTION (login/register) -->
-    <div id="auth" class="text-center">
-      <h2 class="mb-3">Login to BloxVault</h2>
-      <input id="email" type="email" class="form-control mb-2" placeholder="Email" />
-      <input id="password" type="password" class="form-control mb-2" placeholder="Password" />
-      <button onclick="login()" class="btn btn-primary w-100 mb-2">Login</button>
-      <button onclick="register()" class="btn btn-secondary w-100 mb-2">Register</button>
-      <button onclick="googleLogin()" class="btn btn-danger w-100 mb-2"><i class="bi bi-google"></i> Google Login</button>
-      <button onclick="forgotPassword()" class="btn btn-link">Forgot Password?</button>
+    <!-- AUTH SECTION (unchanged, assumed existing in your full code) -->
+    <div id="auth">
+      <!-- Your existing login/register UI here -->
+      <!-- Example (simplified): -->
+      <h2>Login or Register</h2>
+      <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
+      <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
+      <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
+      <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
+      <button class="btn btn-link w-100" onclick="forgotPassword()">Forgot Password?</button>
+      <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()">Sign in with Google</button>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="dashboard" style="display: none;">
-      <div class="card p-4 mb-4">
-        <h2>Welcome, <span id="userEmail">User</span></h2>
-      </div>
-      <div class="card p-4">
-        <h5>Quick Stats</h5>
-        <p>Total Users: 2,500 | Rewards Redeemed: 1,200</p>
-      </div>
+    <div id="dashboard" style="display:none;">
+      <!-- Your existing dashboard content here -->
+      <h1>Welcome to your Dashboard!</h1>
+      <p>Some stats, info, etc.</p>
+      <!-- Other cards or sections you have on the dashboard -->
     </div>
 
-    <!-- REWARDS -->
-    <div id="rewards" style="display: none;">
+    <!-- REDEEM PAGE -->
+    <div id="redeem" style="display:none;">
       <div class="card p-4">
-        <h2 class="text-center mb-4">Request a Reward</h2>
+        <h2 class="text-center mb-4">🎁 Redeem Your Gems</h2>
+        <p class="text-center">Exchange your gems for Robux, crypto, and more!</p>
         <div class="mb-3">
           <label for="rewardType" class="form-label">Choose a Reward</label>
           <select id="rewardType" class="form-select">
@@ -84,15 +91,17 @@
           </select>
         </div>
         <input id="rewardDetails" type="text" class="form-control mb-3" placeholder="Your username or wallet" />
-        <button onclick="requestReward()" class="btn btn-primary w-100">Submit</button>
+        <button onclick="requestReward()" class="btn btn-primary w-100">Submit Request</button>
       </div>
+    </div>
 
-      <!-- Offerwall -->
-      <div class="card p-4 mt-4">
-        <h2 class="text-center mb-4">Earn Gems</h2>
-        <p class="text-center">Complete surveys & offers to earn gems instantly! Check back daily for new offers.</p>
+    <!-- EARN PAGE -->
+    <div id="earn" style="display:none;">
+      <div class="card p-4">
+        <h2 class="text-center mb-4">💎 Earn Gems</h2>
+        <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
         <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-          <iframe id="offerwallFrame"></iframe>
+          <iframe id="offerwallFrame" src=""></iframe>
         </div>
       </div>
     </div>
@@ -117,36 +126,42 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, async (user) => {
-      const authUI = document.getElementById("auth");
-      const navbar = document.getElementById("topNavbar");
-      const dash = document.getElementById("dashboard");
-      const rewards = document.getElementById("rewards");
-      const adminPanel = document.getElementById("adminPanelDropdown");
-      const gemsCountSpan = document.getElementById("gemsCount");
-      const userEmailSpan = document.getElementById("userEmail");
+    const authUI = document.getElementById("auth");
+    const navbar = document.getElementById("topNavbar");
+    const dash = document.getElementById("dashboard");
+    const redeem = document.getElementById("redeem");
+    const earn = document.getElementById("earn");
+    const adminPanel = document.getElementById("adminPanelDropdown");
+    const gemsCountSpan = document.getElementById("gemsCount");
+    const userEmailDisplay = document.getElementById("userEmail");
 
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        if (authUI) authUI.style.display = "none";
-        navbar.style.display = "flex";
-        dash.style.display = "block";
-        rewards.style.display = "none";
-        adminPanel.style.display = (user.email === "zelechowskiadam3@gmail.com") ? "block" : "none";
-        if (userEmailSpan) userEmailSpan.textContent = user.email;
+        if(authUI) authUI.style.display = "none";
+        if(navbar) navbar.style.display = "flex";
+        if(dash) dash.style.display = "block";
+        if(redeem) redeem.style.display = "none";
+        if(earn) earn.style.display = "none";
+        if(adminPanel) adminPanel.style.display = (user.email === "zelechowskiadam3@gmail.com") ? "block" : "none";
+        if(userEmailDisplay) userEmailDisplay.textContent = user.email;
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
-        } catch { gemsCountSpan.textContent = "0"; }
+        } catch {
+          gemsCountSpan.textContent = "0";
+        }
 
         loadOfferwall(user);
       } else {
-        if (authUI) authUI.style.display = "block";
-        navbar.style.display = "none";
-        dash.style.display = "none";
-        rewards.style.display = "none";
-        adminPanel.style.display = "none";
-        gemsCountSpan.textContent = "0";
+        if(authUI) authUI.style.display = "block";
+        if(navbar) navbar.style.display = "none";
+        if(dash) dash.style.display = "none";
+        if(redeem) redeem.style.display = "none";
+        if(earn) earn.style.display = "none";
+        if(adminPanel) adminPanel.style.display = "none";
+        if(gemsCountSpan) gemsCountSpan.textContent = "0";
+        if(userEmailDisplay) userEmailDisplay.textContent = "";
       }
       document.body.style.display = "block";
     });
@@ -154,20 +169,70 @@
     window.loadOfferwall = (user) => {
       const iframe = document.getElementById("offerwallFrame");
       if (!iframe) return;
-      const appId = "YOUR_OFFERWALL_APP_ID";
+      const appId = "YOUR_OFFERWALL_APP_ID"; // Replace with real Offerwall App ID
       iframe.src = `https://www.offertoro.com/ifr/show/${appId}/${user.uid}/desktop`;
     };
 
-    window.login = () => { const email = document.getElementById("email").value; const password = document.getElementById("password").value; signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message)); };
-    window.register = () => { const email = document.getElementById("email").value; const password = document.getElementById("password").value; createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message)); };
+    window.login = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    };
+
+    window.register = () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    };
+
     window.logout = () => signOut(auth);
-    window.showDashboard = () => { document.getElementById("dashboard").style.display = "block"; document.getElementById("rewards").style.display = "none"; };
-    window.showRewards = () => { document.getElementById("dashboard").style.display = "none"; document.getElementById("rewards").style.display = "block"; };
-    window.requestReward = () => { const type = document.getElementById("rewardType").value; const details = document.getElementById("rewardDetails").value; alert(`Requested ${type} reward for ${details}`); };
-    window.forgotPassword = () => { const email = prompt("Please enter your email to reset password:"); if (email) sendPasswordResetEmail(auth, email).then(() => alert("Password reset email sent!")).catch((e) => alert("Error: " + e.message)); };
-    window.googleLogin = () => { const provider = new GoogleAuthProvider(); signInWithPopup(auth, provider).catch(err => alert(err.message)); };
+
+    window.showDashboard = () => {
+      dash.style.display = "block";
+      redeem.style.display = "none";
+      earn.style.display = "none";
+    };
+
+    window.showRedeem = () => {
+      dash.style.display = "none";
+      redeem.style.display = "block";
+      earn.style.display = "none";
+    };
+
+    window.showEarn = () => {
+      dash.style.display = "none";
+      redeem.style.display = "none";
+      earn.style.display = "block";
+    };
+
+    window.requestReward = () => {
+      const type = document.getElementById("rewardType").value;
+      const details = document.getElementById("rewardDetails").value.trim();
+      if (!details) {
+        alert("Please enter your username or wallet address.");
+        return;
+      }
+      alert(`Requested ${type} reward for ${details}`);
+      // TODO: Add actual reward request logic here (Firestore update etc)
+    };
+
+    window.forgotPassword = () => {
+      const email = prompt("Please enter your email to reset password:");
+      if (email) {
+        sendPasswordResetEmail(auth, email)
+          .then(() => alert("Password reset email sent!"))
+          .catch((e) => alert("Error: " + e.message));
+      }
+    };
+
+    window.googleLogin = () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider).catch(err => alert(err.message));
+    };
   </script>
 
+  <!-- Chart.js + Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
