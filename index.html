@@ -22,26 +22,7 @@
     #adminPanelDropdown .dropdown-menu { background-color: #222 !important; border: 1px solid #fff !important; min-width: 200px; }
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
-
-    /* Offerwall container */
-    .offerwall-card {
-      margin-bottom: 20px;
-      border: 2px solid #ffbb33;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .offerwall-card h4 {
-      background: #2c2c2c;
-      color: #fff;
-      padding: 10px;
-      margin: 0;
-    }
-    .offerwall-card iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-    }
+    #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
@@ -73,37 +54,37 @@
   <div class="container py-5">
     <!-- AUTH SECTION -->
     <div id="auth">
-      <h2 class="text-center mb-3">Login or Register</h2>
-      <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
-      <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
-      <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
-      <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-      <button class="btn btn-link w-100 mb-2" onclick="forgotPassword()">Forgot Password?</button>
-      <button class="btn btn-danger w-100" onclick="googleLogin()">Sign in with Google</button>
+      <div class="card p-4 shadow-lg" style="max-width:400px; margin:auto; background:#fff;">
+        <h2 class="text-center mb-4" style="color:#000;">Login or Register</h2>
+        <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
+        <input id="password" type="password" placeholder="Password" class="form-control mb-3" />
+        <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
+        <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
+        <button class="btn btn-link w-100 mb-2" onclick="forgotPassword()">Forgot Password?</button>
+        <button class="btn btn-danger w-100" onclick="googleLogin()">Sign in with Google</button>
+      </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
       <h1>Welcome to your Dashboard!</h1>
-      <p>Your account details and stats appear here.</p>
-      <!-- Example dashboard cards (unchanged from last working version) -->
-      <div class="row">
+      <div class="row mt-4">
         <div class="col-md-4">
-          <div class="card p-3">
+          <div class="card text-center p-3 shadow-sm">
             <h5>Total Gems</h5>
-            <p id="totalGems">Loading...</p>
+            <p class="fs-4 fw-bold" id="dashboardGems">0</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card p-3">
-            <h5>Recent Activity</h5>
-            <p>Coming soon...</p>
+          <div class="card text-center p-3 shadow-sm">
+            <h5>Completed Offers</h5>
+            <p class="fs-4 fw-bold">Coming Soon</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card p-3">
-            <h5>Top Earners</h5>
-            <p>Coming soon...</p>
+          <div class="card text-center p-3 shadow-sm">
+            <h5>Pending Rewards</h5>
+            <p class="fs-4 fw-bold">Coming Soon</p>
           </div>
         </div>
       </div>
@@ -128,37 +109,33 @@
 
     <!-- EARN PAGE -->
     <div id="earn" style="display:none;">
-      <h2 class="text-center mb-4">💎 Earn Gems</h2>
-      <p class="text-center">Complete offers and surveys from multiple providers to earn gems.</p>
+      <div class="card p-4">
+        <h2 class="text-center mb-4">💎 Earn Gems</h2>
+        <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
 
-      <!-- OfferToro -->
-      <div class="offerwall-card">
-        <h4>OfferToro</h4>
-        <iframe id="offerToroFrame"></iframe>
-      </div>
+        <!-- Torox Offerwall -->
+        <div class="mb-4">
+          <h5 class="text-center">Torox Offerwall</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_TOROX_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
 
-      <!-- Lootably -->
-      <div class="offerwall-card">
-        <h4>Lootably</h4>
-        <iframe id="lootablyFrame"></iframe>
-      </div>
+        <!-- CPX Research -->
+        <div class="mb-4">
+          <h5 class="text-center">CPX Research Surveys</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_CPX_RESEARCH_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
 
-      <!-- AdGate -->
-      <div class="offerwall-card">
-        <h4>AdGate</h4>
-        <iframe id="adGateFrame"></iframe>
-      </div>
-
-      <!-- AdGem -->
-      <div class="offerwall-card">
-        <h4>AdGem</h4>
-        <iframe id="adGemFrame"></iframe>
-      </div>
-
-      <!-- CPX Research -->
-      <div class="offerwall-card">
-        <h4>CPX Research</h4>
-        <iframe id="cpxFrame"></iframe>
+        <!-- AdGem Offerwall -->
+        <div class="mb-4">
+          <h5 class="text-center">AdGem Offerwall</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_ADGEM_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -202,11 +179,10 @@
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
+          document.getElementById("dashboardGems").textContent = gemsCountSpan.textContent;
         } catch {
           gemsCountSpan.textContent = "0";
         }
-
-        loadOfferwalls(user);
       } else {
         authUI.style.display = "block";
         navbar.style.display = "none";
@@ -218,15 +194,6 @@
       }
       document.body.style.display = "block";
     });
-
-    function loadOfferwalls(user) {
-      // Replace placeholders with your real App IDs later
-      document.getElementById("offerToroFrame").src = `https://www.offertoro.com/ifr/show/YOUR_OFFERTORO_APP_ID/${user.uid}/desktop`;
-      document.getElementById("lootablyFrame").src = `https://wall.lootably.com/?gameid=YOUR_LOOTABLY_APP_ID&userid=${user.uid}`;
-      document.getElementById("adGateFrame").src = `https://wall.adgaterewards.com/${user.uid}/${'YOUR_ADGATE_APP_ID'}`;
-      document.getElementById("adGemFrame").src = `https://api.adgem.com/v1/wall?appid=YOUR_ADGEM_APP_ID&playerid=${user.uid}`;
-      document.getElementById("cpxFrame").src = `https://offers.cpx-research.com/index.php?app_id=YOUR_CPX_APP_ID&ext_user_id=${user.uid}`;
-    }
 
     window.login = () => {
       const email = document.getElementById("email").value;
@@ -242,20 +209,41 @@
 
     window.logout = () => signOut(auth);
 
-    window.showDashboard = () => { dash.style.display = "block"; redeem.style.display = "none"; earn.style.display = "none"; };
-    window.showRedeem = () => { dash.style.display = "none"; redeem.style.display = "block"; earn.style.display = "none"; };
-    window.showEarn = () => { dash.style.display = "none"; redeem.style.display = "none"; earn.style.display = "block"; };
+    window.showDashboard = () => {
+      dash.style.display = "block";
+      redeem.style.display = "none";
+      earn.style.display = "none";
+    };
+
+    window.showRedeem = () => {
+      dash.style.display = "none";
+      redeem.style.display = "block";
+      earn.style.display = "none";
+    };
+
+    window.showEarn = () => {
+      dash.style.display = "none";
+      redeem.style.display = "none";
+      earn.style.display = "block";
+    };
 
     window.requestReward = () => {
       const type = document.getElementById("rewardType").value;
       const details = document.getElementById("rewardDetails").value.trim();
-      if (!details) return alert("Please enter your username or wallet address.");
+      if (!details) {
+        alert("Please enter your username or wallet address.");
+        return;
+      }
       alert(`Requested ${type} reward for ${details}`);
     };
 
     window.forgotPassword = () => {
       const email = prompt("Please enter your email to reset password:");
-      if (email) sendPasswordResetEmail(auth, email).then(() => alert("Password reset email sent!")).catch(e => alert("Error: " + e.message));
+      if (email) {
+        sendPasswordResetEmail(auth, email)
+          .then(() => alert("Password reset email sent!"))
+          .catch((e) => alert("Error: " + e.message));
+      }
     };
 
     window.googleLogin = () => {
