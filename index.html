@@ -110,28 +110,32 @@
     <input type="email" id="signupEmail" placeholder="Email">
     <input type="text" id="signupUsername" placeholder="Username">
     <input type="password" id="signupPassword" placeholder="Password">
-
     <div class="tos-box">
       <strong>Terms of Service:</strong><br>
       By creating an account, you agree not to misuse this platform, attempt fraudulent activity,
-      or violate any applicable laws. Accounts violating these rules may be suspended or banned.
-      You must be at least 13 years old to participate.
+      or violate any applicable laws. You must be 13+ to participate. Abuse will lead to bans.
     </div>
     <label>
       <input type="checkbox" id="acceptTOS"> I accept the Terms of Service
     </label>
-
     <button class="btn" onclick="signup()">Create Account</button>
     <button class="btn" style="background:#555; color:#fff;" onclick="showLanding()">Back</button>
+  </div>
+
+  <!-- Dashboard (for future use) -->
+  <div id="dashboard" class="hidden">
+    <h1>Hello 👋</h1>
+    <p>You're now logged in. Dashboard coming soon.</p>
+    <button class="btn" onclick="logout()">Logout</button>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",  // ✅ FIXED
+    apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
     authDomain: "bloxvault-d1ff0.firebaseapp.com",
     projectId: "bloxvault-d1ff0",
     storageBucket: "bloxvault-d1ff0.appspot.com",
@@ -142,29 +146,40 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Page toggles
-  window.showLogin = () => {
-    document.getElementById('landing').classList.add('hidden');
-    document.getElementById('signupForm').classList.add('hidden');
-    document.getElementById('loginForm').classList.remove('hidden');
-  };
-  window.showSignup = () => {
-    document.getElementById('landing').classList.add('hidden');
-    document.getElementById('loginForm').classList.add('hidden');
-    document.getElementById('signupForm').classList.remove('hidden');
-  };
-  window.showLanding = () => {
-    document.getElementById('loginForm').classList.add('hidden');
-    document.getElementById('signupForm').classList.add('hidden');
-    document.getElementById('landing').classList.remove('hidden');
-  };
+  // UI Switching
+  const showLogin = () => switchView("loginForm");
+  const showSignup = () => switchView("signupForm");
+  const showLanding = () => switchView("landing");
+  const showDashboard = () => switchView("dashboard");
 
-  // Auth functions
+  function switchView(viewId) {
+    ["landing", "loginForm", "signupForm", "dashboard"].forEach(id => {
+      document.getElementById(id).classList.toggle("hidden", id !== viewId);
+    });
+  }
+
+  // Auto-login
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      showDashboard();
+    } else {
+      showLanding();
+    }
+  });
+
+  // Auth logic
   window.login = () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPassword').value;
     signInWithEmailAndPassword(auth, email, pass)
-      .then(() => alert("Logged in successfully!"))
+      .then(userCred => {
+        if (!userCred.user.emailVerified) {
+          alert("Please verify your email first.");
+          signOut(auth);
+        } else {
+          showDashboard();
+        }
+      })
       .catch(err => alert(err.message));
   };
 
@@ -172,7 +187,7 @@
     const email = document.getElementById('signupEmail').value;
     const pass = document.getElementById('signupPassword').value;
     const tos = document.getElementById('acceptTOS').checked;
-    if (!tos) { alert("You must accept the Terms of Service."); return; }
+    if (!tos) return alert("You must accept the Terms of Service.");
     createUserWithEmailAndPassword(auth, email, pass)
       .then(userCred => {
         sendEmailVerification(userCred.user);
@@ -185,9 +200,18 @@
   window.googleLogin = () => {
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider)
-      .then(() => alert("Logged in with Google!"))
+      .then(() => showDashboard())
       .catch(err => alert(err.message));
   };
+
+  window.logout = () => {
+    signOut(auth).then(() => showLanding());
+  };
+
+  window.showLogin = showLogin;
+  window.showSignup = showSignup;
+  window.showLanding = showLanding;
 </script>
+
 </body>
 </html>
