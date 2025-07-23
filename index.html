@@ -22,7 +22,9 @@
     #adminPanelDropdown .dropdown-menu { background-color: #222 !important; border: 1px solid #fff !important; min-width: 200px; }
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
-    #offerwallFrame { width: 100%; height: 100%; border: none; }
+    .card { background: #fff; border-radius: 10px; }
+    .offerwall-container { width: 100%; height: 600px; border: 2px solid #ffbb33; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+    .offerwall-container iframe { width: 100%; height: 100%; border: none; }
   </style>
 </head>
 <body>
@@ -52,45 +54,45 @@
 
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
-    <!-- AUTH SECTION -->
+    <!-- AUTH -->
     <div id="auth">
-      <div class="card p-4 shadow-lg" style="max-width:400px; margin:auto; background:#fff;">
-        <h2 class="text-center mb-4" style="color:#000;">Login or Register</h2>
+      <div class="card p-4 mx-auto" style="max-width:400px;">
+        <h2 class="text-center mb-4">Login or Register</h2>
         <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
-        <input id="password" type="password" placeholder="Password" class="form-control mb-3" />
+        <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
         <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
         <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-        <button class="btn btn-link w-100 mb-2" onclick="forgotPassword()">Forgot Password?</button>
-        <button class="btn btn-danger w-100" onclick="googleLogin()">Sign in with Google</button>
+        <button class="btn btn-link w-100" onclick="forgotPassword()">Forgot Password?</button>
+        <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()">Sign in with Google</button>
       </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
-      <h1>Welcome to your Dashboard!</h1>
-      <div class="row mt-4">
+      <h1 class="text-center mb-4">Welcome to your Dashboard!</h1>
+      <div class="row g-4">
         <div class="col-md-4">
-          <div class="card text-center p-3 shadow-sm">
-            <h5>Total Gems</h5>
-            <p class="fs-4 fw-bold" id="dashboardGems">0</p>
+          <div class="card p-3 text-center">
+            <h4>Your Gems</h4>
+            <p id="dashGems" class="fw-bold text-warning">0</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card text-center p-3 shadow-sm">
-            <h5>Completed Offers</h5>
-            <p class="fs-4 fw-bold">Coming Soon</p>
+          <div class="card p-3 text-center">
+            <h4>Latest News</h4>
+            <p>Stay tuned for upcoming updates and rewards!</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="card text-center p-3 shadow-sm">
-            <h5>Pending Rewards</h5>
-            <p class="fs-4 fw-bold">Coming Soon</p>
+          <div class="card p-3 text-center">
+            <h4>Quick Tip</h4>
+            <p>Complete Earn offers daily for maximum gems!</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- REDEEM PAGE -->
+    <!-- REDEEM -->
     <div id="redeem" style="display:none;">
       <div class="card p-4">
         <h2 class="text-center mb-4">🎁 Redeem Your Gems</h2>
@@ -107,35 +109,19 @@
       </div>
     </div>
 
-    <!-- EARN PAGE -->
+    <!-- EARN -->
     <div id="earn" style="display:none;">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">💎 Earn Gems</h2>
-        <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
+      <h2 class="text-center mb-4">💎 Earn Gems</h2>
+      <p class="text-center mb-4">Complete surveys & offers to earn gems instantly!</p>
 
-        <!-- Torox Offerwall -->
-        <div class="mb-4">
-          <h5 class="text-center">Torox Offerwall</h5>
-          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-            <iframe src="YOUR_TOROX_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
-          </div>
-        </div>
-
-        <!-- CPX Research -->
-        <div class="mb-4">
-          <h5 class="text-center">CPX Research Surveys</h5>
-          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-            <iframe src="YOUR_CPX_RESEARCH_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
-          </div>
-        </div>
-
-        <!-- AdGem Offerwall -->
-        <div class="mb-4">
-          <h5 class="text-center">AdGem Offerwall</h5>
-          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-            <iframe src="YOUR_ADGEM_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
-          </div>
-        </div>
+      <div class="offerwall-container">
+        <iframe src="https://example.com/torox" title="Torox Offerwall"></iframe>
+      </div>
+      <div class="offerwall-container">
+        <iframe src="https://example.com/cpx" title="CPX Research Offerwall"></iframe>
+      </div>
+      <div class="offerwall-container">
+        <iframe src="https://example.com/adgem" title="AdGem Offerwall"></iframe>
       </div>
     </div>
   </div>
@@ -166,6 +152,7 @@
     const earn = document.getElementById("earn");
     const adminPanel = document.getElementById("adminPanelDropdown");
     const gemsCountSpan = document.getElementById("gemsCount");
+    const dashGems = document.getElementById("dashGems");
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -178,10 +165,12 @@
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
-          gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
-          document.getElementById("dashboardGems").textContent = gemsCountSpan.textContent;
+          const points = userDoc.exists() ? (userDoc.data().points || 0) : 0;
+          gemsCountSpan.textContent = points;
+          dashGems.textContent = points;
         } catch {
           gemsCountSpan.textContent = "0";
+          dashGems.textContent = "0";
         }
       } else {
         authUI.style.display = "block";
@@ -191,6 +180,7 @@
         earn.style.display = "none";
         adminPanel.style.display = "none";
         gemsCountSpan.textContent = "0";
+        dashGems.textContent = "0";
       }
       document.body.style.display = "block";
     });
