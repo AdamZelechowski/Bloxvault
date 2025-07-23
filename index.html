@@ -23,7 +23,6 @@
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
 
-    /* Dashboard cards */
     .dashboard-card {
       background-color: #2c2c2c;
       color: #fff;
@@ -32,11 +31,8 @@
       padding: 20px;
       text-align: center;
     }
-    .dashboard-card h4 {
-      color: #ffbb33;
-      font-weight: bold;
-    }
-    /* Offerwall */
+    .dashboard-card h4 { color: #ffbb33; font-weight: bold; }
+
     #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
@@ -122,36 +118,19 @@
       </div>
     </div>
 
-    <!-- EARN PAGE -->
-<div class="card p-4">
-  <h2 class="text-center mb-4">💎 Earn Gems</h2>
-  <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
-  <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display: flex; flex-direction: column; gap: 10px;">
-    
-    <!-- Torox -->
-    <iframe 
-      id="offerwallFrameTorox" 
-      src="https://wall.torox.gg/your_torox_app_id?uid=USER_ID" 
-      style="height:190px; width:100%; border:none; border-radius: 8px;">
-    </iframe>
-
-    <!-- CPX Research -->
-    <iframe 
-      id="offerwallFrameCPX" 
-      src="https://offers.cpx-research.com/index.php?app_id=YOUR_APP_ID&ext_user_id=USER_ID" 
-      style="height:190px; width:100%; border:none; border-radius: 8px;">
-    </iframe>
-
-    <!-- AdGem -->
-    <iframe 
-      id="offerwallFrameAdGem" 
-      src="https://api.adgem.com/v1/wall?appid=YOUR_APP_ID&playerid=USER_ID" 
-      style="height:190px; width:100%; border:none; border-radius: 8px;">
-    </iframe>
-
+    <!-- ✅ FIXED EARN PAGE -->
+    <div id="earn" style="display:none;">
+      <div class="card p-4">
+        <h2 class="text-center mb-4">💎 Earn Gems</h2>
+        <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
+        <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; gap:10px;">
+          <iframe id="offerwallFrameTorox" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
+          <iframe id="offerwallFrameCPX" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
+          <iframe id="offerwallFrameAdGem" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
 
   <!-- FIREBASE + LOGIC -->
   <script type="module">
@@ -214,11 +193,15 @@
       document.body.style.display = "block";
     });
 
+    // ✅ FIXED: Load all three offerwalls dynamically with user.uid
     window.loadOfferwall = (user) => {
-      const iframe = document.getElementById("offerwallFrame");
-      if (!iframe) return;
-      const appId = "YOUR_OFFERWALL_APP_ID"; 
-      iframe.src = `https://www.offertoro.com/ifr/show/${appId}/${user.uid}/desktop`;
+      const torox = document.getElementById("offerwallFrameTorox");
+      const cpx = document.getElementById("offerwallFrameCPX");
+      const adgem = document.getElementById("offerwallFrameAdGem");
+
+      if (torox) torox.src = `https://wall.torox.gg/YOUR_TOROX_APP_ID?uid=${user.uid}`;
+      if (cpx) cpx.src = `https://offers.cpx-research.com/index.php?app_id=YOUR_CPX_APP_ID&ext_user_id=${user.uid}`;
+      if (adgem) adgem.src = `https://api.adgem.com/v1/wall?appid=YOUR_ADGEM_APP_ID&playerid=${user.uid}`;
     };
 
     window.login = () => {
@@ -278,7 +261,6 @@
     };
   </script>
 
-  <!-- Chart.js + Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
