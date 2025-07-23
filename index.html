@@ -36,7 +36,7 @@
 
     #offerwallFrame { width: 100%; height: 100%; border: none; }
 
-    /* ===== Landing/Login/Signup styles ===== */
+    /* Landing/Login/Signup styles */
     #landingPage {
       background: linear-gradient(135deg, #ffbb33, #ff7700);
       border-radius: 12px;
@@ -74,6 +74,7 @@
       box-shadow: 0 5px 15px #ff7700aa;
       color: #fff;
       background: #2c2c2c;
+      cursor: pointer;
     }
     #landingPage .btn:hover {
       background: #3b3b3b;
@@ -111,6 +112,7 @@
       margin-right: 8px;
       transform: scale(1.1);
       vertical-align: middle;
+      cursor: pointer;
     }
     #landingPage form .tos-text {
       color: #eee;
@@ -203,11 +205,11 @@
   <!-- MAIN CONTAINER -->
   <div class="container py-5">
 
-    <!-- LANDING + LOGIN + SIGNUP COMBINED -->
+    <!-- LANDING + LOGIN + SIGNUP -->
     <div id="landingPage">
       <h2>Welcome to BloxVault!</h2>
       <p>Earn gems by completing offers and surveys, then redeem for Robux, crypto, and more. Safe, easy, and fast.</p>
-      
+
       <div id="landingButtons" class="d-flex justify-content-center gap-3 mb-4">
         <button class="btn" id="showLoginBtn">Login</button>
         <button class="btn" id="showSignupBtn">Sign Up</button>
@@ -244,14 +246,6 @@
         <button class="submit-btn" type="submit">Create Account</button>
         <div class="switch-link" id="toLoginLink">Already have an account? Login</div>
       </form>
-    </div>
-
-    <!-- AUTH SECTION -->
-    <div id="auth" style="display:none;">
-      <div class="card p-4 mx-auto" style="max-width:400px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
-        <h2 class="text-center mb-4" style="color:#ffbb33;">Login or Register</h2>
-        <!-- kept hidden since replaced by landingPage -->
-      </div>
     </div>
 
     <!-- DASHBOARD -->
@@ -314,7 +308,16 @@
   <!-- FIREBASE + LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut,
+      sendPasswordResetEmail,
+      GoogleAuthProvider,
+      signInWithPopup,
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
     import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -334,4 +337,159 @@
     const landingPage = document.getElementById("landingPage");
     const dashboard = document.getElementById("dashboard");
     const redeem = document.getElementById("redeem");
-    const earn = document.get
+    const earn = document.getElementById("earn");
+    const adminPanel = document.getElementById("adminPanelDropdown");
+    const gemsCountSpan = document.getElementById("gemsCount");
+    const dashboardGems = document.getElementById("dashboardGems");
+
+    // Show different pages
+    function showDashboard() {
+      landingPage.style.display = "none";
+      dashboard.style.display = "block";
+      redeem.style.display = "none";
+      earn.style.display = "none";
+      updateGemsDisplay();
+    }
+    function showRedeem() {
+      landingPage.style.display = "none";
+      dashboard.style.display = "none";
+      redeem.style.display = "block";
+      earn.style.display = "none";
+    }
+    function showEarn() {
+      landingPage.style.display = "none";
+      dashboard.style.display = "none";
+      redeem.style.display = "none";
+      earn.style.display = "block";
+      loadOfferwalls();
+    }
+
+    // Load Offerwall iframes
+    function loadOfferwalls() {
+      document.getElementById("offerwallFrameTorox").src = "https://torox.com/offerwall";
+      document.getElementById("offerwallFrameCPX").src = "https://cpx.to/offerwall";
+      document.getElementById("offerwallFrameAdGem").src = "https://adgem.com/offerwall";
+    }
+
+    // Update gems count display (stub - replace with actual data retrieval)
+    function updateGemsDisplay() {
+      // For example purposes, just showing a static number
+      let gems = 123; // TODO: Fetch from Firestore or user data
+      gemsCountSpan.textContent = gems;
+      dashboardGems.textContent = gems + " Gems";
+    }
+
+    // Auth state listener
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        navbar.style.display = "flex";
+        landingPage.style.display = "none";
+        dashboard.style.display = "block";
+        redeem.style.display = "none";
+        earn.style.display = "none";
+
+        updateGemsDisplay();
+
+        // Check admin role in Firestore (example)
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists() && userDoc.data().role === "admin") {
+          adminPanel.style.display = "block";
+        } else {
+          adminPanel.style.display = "none";
+        }
+      } else {
+        navbar.style.display = "none";
+        landingPage.style.display = "block";
+        dashboard.style.display = "none";
+        redeem.style.display = "none";
+        earn.style.display = "none";
+        adminPanel.style.display = "none";
+      }
+    });
+
+    // Login function
+    window.login = () => {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          alert("Logged in as " + userCredential.user.email);
+        })
+        .catch((error) => alert("Login failed: " + error.message));
+    };
+
+    // Signup function
+    window.signup = () => {
+      const email = document.getElementById("signupEmail").value;
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const tosAccepted = document.getElementById("acceptTOS").checked;
+
+      if (!tosAccepted) {
+        alert("You must accept the Terms of Service to sign up.");
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(async (userCredential) => {
+          alert("Account created for " + userCredential.user.email + ". You may need to verify your email.");
+          // TODO: Save username and default role in Firestore
+          // Example:
+          // await setDoc(doc(db, "users", userCredential.user.uid), { username, role: "user" });
+        })
+        .catch((error) => alert("Signup failed: " + error.message));
+    };
+
+    // Google sign-in
+    window.googleLogin = () => {
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .then((result) => alert("Signed in as " + result.user.email))
+        .catch((error) => alert("Google sign-in failed: " + error.message));
+    };
+
+    // Logout
+    window.logout = () => {
+      signOut(auth)
+        .then(() => alert("Logged out"))
+        .catch((error) => alert("Logout failed: " + error.message));
+    };
+
+    // Reward request (dummy)
+    window.requestReward = () => {
+      alert("Reward request submitted! We will process it shortly.");
+    };
+
+    // Admin Panel dummy functions
+    window.viewUsers = () => alert("Admin: View Users clicked");
+    window.viewRewardRequests = () => alert("Admin: Reward Requests clicked");
+    window.runDiagnostics = () => alert("Admin: Diagnostics running");
+    window.adminLookupUser = () => alert("Admin: User Lookup clicked");
+
+    // Show login/signup toggles
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("showLoginBtn").onclick = () => {
+        document.getElementById("landingButtons").style.display = "none";
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+      };
+      document.getElementById("showSignupBtn").onclick = () => {
+        document.getElementById("landingButtons").style.display = "none";
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("signupForm").style.display = "block";
+      };
+      document.getElementById("toSignupLink").onclick = () => {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("signupForm").style.display = "block";
+      };
+      document.getElementById("toLoginLink").onclick = () => {
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+      };
+    });
+  </script>
+
+  <!-- Bootstrap JS bundle (Popper + Bootstrap) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
