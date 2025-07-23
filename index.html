@@ -23,6 +23,7 @@
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
 
+    /* Dashboard cards */
     .dashboard-card {
       background-color: #2c2c2c;
       color: #fff;
@@ -31,8 +32,11 @@
       padding: 20px;
       text-align: center;
     }
-    .dashboard-card h4 { color: #ffbb33; font-weight: bold; }
-
+    .dashboard-card h4 {
+      color: #ffbb33;
+      font-weight: bold;
+    }
+    /* Offerwall */
     #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
@@ -67,12 +71,31 @@
     <div id="auth">
       <div class="card p-4 mx-auto" style="max-width:400px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
         <h2 class="text-center mb-4" style="color:#ffbb33;">Login or Register</h2>
+
+        <div id="authError" class="alert alert-danger d-none" role="alert"></div>
+
         <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
         <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
-        <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
-        <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-        <button class="btn btn-link w-100 text-light" onclick="forgotPassword()">Forgot Password?</button>
-        <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()"><i class="bi bi-google"></i> Sign in with Google</button>
+
+        <div class="form-check text-light mb-3">
+          <input class="form-check-input" type="checkbox" id="tosCheck" />
+          <label class="form-check-label" for="tosCheck">
+            I accept the <a href="#" class="text-warning" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+          </label>
+        </div>
+
+        <button id="loginBtn" class="btn btn-primary w-100 mb-2">Login</button>
+        <button id="registerBtn" class="btn btn-secondary w-100 mb-2">Register</button>
+        <button id="forgotBtn" class="btn btn-link w-100 text-light">Forgot Password?</button>
+
+        <button id="googleLoginBtn" class="btn btn-danger w-100 mt-3">
+          <i class="bi bi-google"></i> Sign in with Google
+        </button>
+      </div>
+
+      <div class="alert alert-warning mt-3 mx-auto" style="max-width:400px; color:#2c2c2c; background:#ffbb33; border-color:#ffbb33;">
+        <strong>What is BloxVault?</strong><br />
+        Earn gems by completing surveys and offers. Redeem gems for Robux, crypto, and more!
       </div>
     </div>
 
@@ -118,15 +141,32 @@
       </div>
     </div>
 
-    <!-- ✅ FIXED EARN PAGE -->
+    <!-- EARN PAGE -->
     <div id="earn" style="display:none;">
       <div class="card p-4">
         <h2 class="text-center mb-4">💎 Earn Gems</h2>
         <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
-        <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; gap:10px;">
-          <iframe id="offerwallFrameTorox" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
-          <iframe id="offerwallFrameCPX" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
-          <iframe id="offerwallFrameAdGem" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
+        <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display: flex; flex-direction: column; gap: 10px;">
+          <!-- Torox -->
+          <iframe 
+            id="offerwallFrameTorox" 
+            src="https://wall.torox.gg/your_torox_app_id?uid=USER_ID" 
+            style="height:190px; width:100%; border:none; border-radius: 8px;">
+          </iframe>
+
+          <!-- CPX Research -->
+          <iframe 
+            id="offerwallFrameCPX" 
+            src="https://offers.cpx-research.com/index.php?app_id=YOUR_APP_ID&ext_user_id=USER_ID" 
+            style="height:190px; width:100%; border:none; border-radius: 8px;">
+          </iframe>
+
+          <!-- AdGem -->
+          <iframe 
+            id="offerwallFrameAdGem" 
+            src="https://api.adgem.com/v1/wall?appid=YOUR_APP_ID&playerid=USER_ID" 
+            style="height:190px; width:100%; border:none; border-radius: 8px;">
+          </iframe>
         </div>
       </div>
     </div>
@@ -135,8 +175,18 @@
   <!-- FIREBASE + LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+    import { 
+      getAuth, 
+      onAuthStateChanged, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signOut, 
+      sendPasswordResetEmail, 
+      GoogleAuthProvider, 
+      signInWithPopup,
+      sendEmailVerification
+    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBDuLLrHkMp8J3iyb183lDzSrNNIPallcQ",
@@ -159,6 +209,29 @@
     const adminPanel = document.getElementById("adminPanelDropdown");
     const gemsCountSpan = document.getElementById("gemsCount");
     const dashboardGems = document.getElementById("dashboardGems");
+    const authErrorDiv = document.getElementById("authError");
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const forgotBtn = document.getElementById("forgotBtn");
+    const googleLoginBtn = document.getElementById("googleLoginBtn");
+
+    function showError(message) {
+      authErrorDiv.textContent = message;
+      authErrorDiv.classList.remove("d-none");
+    }
+
+    function clearError() {
+      authErrorDiv.textContent = "";
+      authErrorDiv.classList.add("d-none");
+    }
+
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 6;
+    }
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -178,8 +251,6 @@
           gemsCountSpan.textContent = "0";
           dashboardGems.textContent = "0 Gems";
         }
-
-        loadOfferwall(user);
       } else {
         authUI.style.display = "block";
         navbar.style.display = "none";
@@ -193,30 +264,74 @@
       document.body.style.display = "block";
     });
 
-    // ✅ FIXED: Load all three offerwalls dynamically with user.uid
-    window.loadOfferwall = (user) => {
-      const torox = document.getElementById("offerwallFrameTorox");
-      const cpx = document.getElementById("offerwallFrameCPX");
-      const adgem = document.getElementById("offerwallFrameAdGem");
+    loginBtn.addEventListener("click", async () => {
+      clearError();
 
-      if (torox) torox.src = `https://wall.torox.gg/YOUR_TOROX_APP_ID?uid=${user.uid}`;
-      if (cpx) cpx.src = `https://offers.cpx-research.com/index.php?app_id=YOUR_CPX_APP_ID&ext_user_id=${user.uid}`;
-      if (adgem) adgem.src = `https://api.adgem.com/v1/wall?appid=YOUR_ADGEM_APP_ID&playerid=${user.uid}`;
-    };
-
-    window.login = () => {
-      const email = document.getElementById("email").value;
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
-    };
+      const tosAccepted = document.getElementById("tosCheck").checked;
 
-    window.register = () => {
-      const email = document.getElementById("email").value;
+      if (!tosAccepted) return showError("You must accept the Terms of Service.");
+      if (!validateEmail(email)) return showError("Please enter a valid email address.");
+      if (!validatePassword(password)) return showError("Password must be at least 6 characters.");
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        if (!userCredential.user.emailVerified) {
+          await signOut(auth);
+          return showError("Please verify your email before logging in. Check your inbox.");
+        }
+      } catch (err) {
+        showError(err.message);
+      }
+    });
+
+    registerBtn.addEventListener("click", async () => {
+      clearError();
+
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
-    };
+      const tosAccepted = document.getElementById("tosCheck").checked;
 
-    window.logout = () => signOut(auth);
+      if (!tosAccepted) return showError("You must accept the Terms of Service.");
+      if (!validateEmail(email)) return showError("Please enter a valid email address.");
+      if (!validatePassword(password)) return showError("Password must be at least 6 characters.");
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCredential.user);
+        alert("Registration successful! Please check your email for verification before logging in.");
+      } catch (err) {
+        showError(err.message);
+      }
+    });
+
+    forgotBtn.addEventListener("click", () => {
+      clearError();
+
+      const email = prompt("Please enter your email to reset password:");
+      if (!email) return;
+
+      if (!validateEmail(email)) {
+        return showError("Please enter a valid email address.");
+      }
+
+      sendPasswordResetEmail(auth, email)
+        .then(() => alert("Password reset email sent!"))
+        .catch((e) => showError(e.message));
+    });
+
+    googleLoginBtn.addEventListener("click", async () => {
+      clearError();
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        await setDoc(doc(db, "users", user.uid), { points: 0 }, { merge: true });
+      } catch (err) {
+        showError(err.message);
+      }
+    });
 
     window.showDashboard = () => {
       dash.style.display = "block";
@@ -246,21 +361,11 @@
       alert(`Requested ${type} reward for ${details}`);
     };
 
-    window.forgotPassword = () => {
-      const email = prompt("Please enter your email to reset password:");
-      if (email) {
-        sendPasswordResetEmail(auth, email)
-          .then(() => alert("Password reset email sent!"))
-          .catch((e) => alert("Error: " + e.message));
-      }
-    };
+    window.logout = () => signOut(auth);
 
-    window.googleLogin = () => {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider).catch(err => alert(err.message));
-    };
   </script>
 
+  <!-- Chart.js + Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
