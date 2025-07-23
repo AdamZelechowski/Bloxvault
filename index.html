@@ -22,21 +22,6 @@
     #adminPanelDropdown .dropdown-menu { background-color: #222 !important; border: 1px solid #fff !important; min-width: 200px; }
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
-
-    /* Dashboard cards */
-    .dashboard-card {
-      background-color: #2c2c2c;
-      color: #fff;
-      border: 2px solid #ffbb33;
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-    }
-    .dashboard-card h4 {
-      color: #ffbb33;
-      font-weight: bold;
-    }
-    /* Offerwall */
     #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
 </head>
@@ -69,37 +54,37 @@
   <div class="container py-5">
     <!-- AUTH SECTION -->
     <div id="auth">
-      <div class="card p-4 mx-auto" style="max-width:400px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
-        <h2 class="text-center mb-4" style="color:#ffbb33;">Login or Register</h2>
+      <div class="card p-4 shadow-lg" style="max-width:400px; margin:auto; background:#fff;">
+        <h2 class="text-center mb-4" style="color:#000;">Login or Register</h2>
         <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
-        <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
+        <input id="password" type="password" placeholder="Password" class="form-control mb-3" />
         <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
         <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-        <button class="btn btn-link w-100 text-light" onclick="forgotPassword()">Forgot Password?</button>
-        <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()"><i class="bi bi-google"></i> Sign in with Google</button>
+        <button class="btn btn-link w-100 mb-2" onclick="forgotPassword()">Forgot Password?</button>
+        <button class="btn btn-danger w-100" onclick="googleLogin()">Sign in with Google</button>
       </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
-      <h1 class="text-center mb-4" style="color:#fff;">Welcome to your Dashboard!</h1>
-      <div class="row g-4">
+      <h1>Welcome to your Dashboard!</h1>
+      <div class="row mt-4">
         <div class="col-md-4">
-          <div class="dashboard-card">
-            <h4><i class="bi bi-gem"></i> Your Gems</h4>
-            <p id="dashboardGems">Loading...</p>
+          <div class="card text-center p-3 shadow-sm">
+            <h5>Total Gems</h5>
+            <p class="fs-4 fw-bold" id="dashboardGems">0</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="dashboard-card">
-            <h4><i class="bi bi-graph-up"></i> Recent Activity</h4>
-            <p>Track your latest earnings & redemptions.</p>
+          <div class="card text-center p-3 shadow-sm">
+            <h5>Completed Offers</h5>
+            <p class="fs-4 fw-bold">Coming Soon</p>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="dashboard-card">
-            <h4><i class="bi bi-trophy"></i> Top Earners</h4>
-            <p>See who's earning the most this week!</p>
+          <div class="card text-center p-3 shadow-sm">
+            <h5>Pending Rewards</h5>
+            <p class="fs-4 fw-bold">Coming Soon</p>
           </div>
         </div>
       </div>
@@ -127,8 +112,29 @@
       <div class="card p-4">
         <h2 class="text-center mb-4">💎 Earn Gems</h2>
         <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
-        <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
-          <iframe id="offerwallFrame" src=""></iframe>
+
+        <!-- Torox Offerwall -->
+        <div class="mb-4">
+          <h5 class="text-center">Torox Offerwall</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_TOROX_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
+
+        <!-- CPX Research -->
+        <div class="mb-4">
+          <h5 class="text-center">CPX Research Surveys</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_CPX_RESEARCH_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
+        </div>
+
+        <!-- AdGem Offerwall -->
+        <div class="mb-4">
+          <h5 class="text-center">AdGem Offerwall</h5>
+          <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden;">
+            <iframe src="YOUR_ADGEM_OFFERWALL_LINK_HERE" style="width:100%; height:100%; border:none;"></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -160,7 +166,6 @@
     const earn = document.getElementById("earn");
     const adminPanel = document.getElementById("adminPanelDropdown");
     const gemsCountSpan = document.getElementById("gemsCount");
-    const dashboardGems = document.getElementById("dashboardGems");
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -173,15 +178,11 @@
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
-          const points = userDoc.exists() ? (userDoc.data().points || 0) : 0;
-          gemsCountSpan.textContent = points;
-          dashboardGems.textContent = points + " Gems";
+          gemsCountSpan.textContent = userDoc.exists() ? (userDoc.data().points || 0) : "0";
+          document.getElementById("dashboardGems").textContent = gemsCountSpan.textContent;
         } catch {
           gemsCountSpan.textContent = "0";
-          dashboardGems.textContent = "0 Gems";
         }
-
-        loadOfferwall(user);
       } else {
         authUI.style.display = "block";
         navbar.style.display = "none";
@@ -190,17 +191,9 @@
         earn.style.display = "none";
         adminPanel.style.display = "none";
         gemsCountSpan.textContent = "0";
-        dashboardGems.textContent = "0 Gems";
       }
       document.body.style.display = "block";
     });
-
-    window.loadOfferwall = (user) => {
-      const iframe = document.getElementById("offerwallFrame");
-      if (!iframe) return;
-      const appId = "YOUR_OFFERWALL_APP_ID"; 
-      iframe.src = `https://www.offertoro.com/ifr/show/${appId}/${user.uid}/desktop`;
-    };
 
     window.login = () => {
       const email = document.getElementById("email").value;
@@ -264,4 +257,3 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
