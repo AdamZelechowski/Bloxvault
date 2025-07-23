@@ -71,31 +71,29 @@
     <div id="auth">
       <div class="card p-4 mx-auto" style="max-width:400px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
         <h2 class="text-center mb-4" style="color:#ffbb33;">Login or Register</h2>
-
-        <div id="authError" class="alert alert-danger d-none" role="alert"></div>
-
         <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
         <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
 
-        <div class="form-check text-light mb-3">
-          <input class="form-check-input" type="checkbox" id="tosCheck" />
-          <label class="form-check-label" for="tosCheck">
-            I accept the <a href="#" class="text-warning" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="tosCheckbox" />
+          <label class="form-check-label text-white" for="tosCheckbox" style="font-size:0.9rem;">
+            I agree to the <a href="#" onclick="alert(tosText)" style="color:#ffbb33; text-decoration: underline;">Terms of Service</a>.
           </label>
         </div>
 
-        <button id="loginBtn" class="btn btn-primary w-100 mb-2">Login</button>
-        <button id="registerBtn" class="btn btn-secondary w-100 mb-2">Register</button>
-        <button id="forgotBtn" class="btn btn-link w-100 text-light">Forgot Password?</button>
-
-        <button id="googleLoginBtn" class="btn btn-danger w-100 mt-3">
-          <i class="bi bi-google"></i> Sign in with Google
-        </button>
+        <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
+        <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
+        <button class="btn btn-link w-100 text-light" onclick="forgotPassword()">Forgot Password?</button>
+        <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()"><i class="bi bi-google"></i> Sign in with Google</button>
       </div>
 
-      <div class="alert alert-warning mt-3 mx-auto" style="max-width:400px; color:#2c2c2c; background:#ffbb33; border-color:#ffbb33;">
-        <strong>What is BloxVault?</strong><br />
-        Earn gems by completing surveys and offers. Redeem gems for Robux, crypto, and more!
+      <div class="card p-3 mx-auto mt-4" style="max-width:400px; background:#222; color:#fff; border:2px solid #ffbb33;">
+        <h5>About BloxVault</h5>
+        <p>
+          BloxVault lets you earn gems by completing surveys and offers.<br />
+          Redeem gems for Robux, crypto, and other rewards.<br />
+          Please use responsibly and follow our Terms of Service.
+        </p>
       </div>
     </div>
 
@@ -153,14 +151,12 @@
             src="https://wall.torox.gg/your_torox_app_id?uid=USER_ID" 
             style="height:190px; width:100%; border:none; border-radius: 8px;">
           </iframe>
-
           <!-- CPX Research -->
           <iframe 
             id="offerwallFrameCPX" 
             src="https://offers.cpx-research.com/index.php?app_id=YOUR_APP_ID&ext_user_id=USER_ID" 
             style="height:190px; width:100%; border:none; border-radius: 8px;">
           </iframe>
-
           <!-- AdGem -->
           <iframe 
             id="offerwallFrameAdGem" 
@@ -175,17 +171,7 @@
   <!-- FIREBASE + LOGIC -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-    import { 
-      getAuth, 
-      onAuthStateChanged, 
-      signInWithEmailAndPassword, 
-      createUserWithEmailAndPassword, 
-      signOut, 
-      sendPasswordResetEmail, 
-      GoogleAuthProvider, 
-      signInWithPopup,
-      sendEmailVerification
-    } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -209,32 +195,45 @@
     const adminPanel = document.getElementById("adminPanelDropdown");
     const gemsCountSpan = document.getElementById("gemsCount");
     const dashboardGems = document.getElementById("dashboardGems");
-    const authErrorDiv = document.getElementById("authError");
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const forgotBtn = document.getElementById("forgotBtn");
-    const googleLoginBtn = document.getElementById("googleLoginBtn");
 
-    function showError(message) {
-      authErrorDiv.textContent = message;
-      authErrorDiv.classList.remove("d-none");
-    }
+    const tosText = `
+Terms of Service
 
-    function clearError() {
-      authErrorDiv.textContent = "";
-      authErrorDiv.classList.add("d-none");
-    }
+Welcome to BloxVault! By using our site, you agree to comply with and be bound by these Terms of Service. Please read them carefully.
 
-    function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
+1. Eligibility  
+You must be at least 13 years old to use our services.
 
-    function validatePassword(password) {
-      return password.length >= 6;
-    }
+2. Account Security  
+You are responsible for maintaining the confidentiality of your account and password.
+
+3. User Conduct  
+You agree not to use the site for any unlawful purposes or activities that violate these Terms.
+
+4. Rewards & Points  
+Rewards and points are subject to verification. Abuse or fraudulent activity may result in account suspension.
+
+5. Privacy  
+Your data is handled according to our Privacy Policy.
+
+6. Changes to Terms  
+We may update these Terms at any time without prior notice.
+
+7. Contact  
+If you have any questions, please contact support@bloxvault.com.
+
+By creating an account, you accept these Terms of Service.
+`;
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        if (!user.emailVerified) {
+          alert("Please verify your email address before continuing. A verification email has been sent if you haven't received one.");
+          await sendEmailVerification(user);
+          await signOut(auth);
+          return;
+        }
+
         authUI.style.display = "none";
         navbar.style.display = "flex";
         dash.style.display = "block";
@@ -244,7 +243,13 @@
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
-          const points = userDoc.exists() ? (userDoc.data().points || 0) : 0;
+          let points = 0;
+          if (userDoc.exists()) {
+            points = userDoc.data().points || 0;
+          } else {
+            // Initialize user document if doesn't exist
+            await setDoc(doc(db, "users", user.uid), { points: 0 });
+          }
           gemsCountSpan.textContent = points;
           dashboardGems.textContent = points + " Gems";
         } catch {
@@ -264,74 +269,41 @@
       document.body.style.display = "block";
     });
 
-    loginBtn.addEventListener("click", async () => {
-      clearError();
-
-      const email = document.getElementById("email").value.trim();
+    window.login = () => {
+      const tosChecked = document.getElementById("tosCheckbox").checked;
+      if (!tosChecked) {
+        alert("You must accept the Terms of Service before logging in.");
+        return;
+      }
+      const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const tosAccepted = document.getElementById("tosCheck").checked;
+      signInWithEmailAndPassword(auth, email, password)
+        .then(({ user }) => {
+          if (!user.emailVerified) {
+            alert("Please verify your email. Verification email sent.");
+            return sendEmailVerification(user);
+          }
+        })
+        .catch(err => alert(err.message));
+    };
 
-      if (!tosAccepted) return showError("You must accept the Terms of Service.");
-      if (!validateEmail(email)) return showError("Please enter a valid email address.");
-      if (!validatePassword(password)) return showError("Password must be at least 6 characters.");
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        if (!userCredential.user.emailVerified) {
-          await signOut(auth);
-          return showError("Please verify your email before logging in. Check your inbox.");
-        }
-      } catch (err) {
-        showError(err.message);
+    window.register = () => {
+      const tosChecked = document.getElementById("tosCheckbox").checked;
+      if (!tosChecked) {
+        alert("You must accept the Terms of Service before registering.");
+        return;
       }
-    });
-
-    registerBtn.addEventListener("click", async () => {
-      clearError();
-
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      const tosAccepted = document.getElementById("tosCheck").checked;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(({ user }) => {
+          sendEmailVerification(user);
+          alert("Registration successful! Please verify your email before logging in.");
+        })
+        .catch(err => alert(err.message));
+    };
 
-      if (!tosAccepted) return showError("You must accept the Terms of Service.");
-      if (!validateEmail(email)) return showError("Please enter a valid email address.");
-      if (!validatePassword(password)) return showError("Password must be at least 6 characters.");
-
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        await sendEmailVerification(userCredential.user);
-        alert("Registration successful! Please check your email for verification before logging in.");
-      } catch (err) {
-        showError(err.message);
-      }
-    });
-
-    forgotBtn.addEventListener("click", () => {
-      clearError();
-
-      const email = prompt("Please enter your email to reset password:");
-      if (!email) return;
-
-      if (!validateEmail(email)) {
-        return showError("Please enter a valid email address.");
-      }
-
-      sendPasswordResetEmail(auth, email)
-        .then(() => alert("Password reset email sent!"))
-        .catch((e) => showError(e.message));
-    });
-
-    googleLoginBtn.addEventListener("click", async () => {
-      clearError();
-      const provider = new GoogleAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        await setDoc(doc(db, "users", user.uid), { points: 0 }, { merge: true });
-      } catch (err) {
-        showError(err.message);
-      }
-    });
+    window.logout = () => signOut(auth);
 
     window.showDashboard = () => {
       dash.style.display = "block";
@@ -361,8 +333,31 @@
       alert(`Requested ${type} reward for ${details}`);
     };
 
-    window.logout = () => signOut(auth);
+    window.forgotPassword = () => {
+      const email = prompt("Please enter your email to reset password:");
+      if (email) {
+        sendPasswordResetEmail(auth, email)
+          .then(() => alert("Password reset email sent!"))
+          .catch((e) => alert("Error: " + e.message));
+      }
+    };
 
+    window.googleLogin = () => {
+      const tosChecked = document.getElementById("tosCheckbox").checked;
+      if (!tosChecked) {
+        alert("You must accept the Terms of Service before logging in.");
+        return;
+      }
+      const provider = new GoogleAuthProvider();
+      signInWithPopup(auth, provider)
+        .then(({ user }) => {
+          if (!user.emailVerified) {
+            alert("Please verify your email. Verification email sent.");
+            return sendEmailVerification(user);
+          }
+        })
+        .catch(err => alert(err.message));
+    };
   </script>
 
   <!-- Chart.js + Bootstrap JS -->
