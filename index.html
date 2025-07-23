@@ -123,13 +123,32 @@
     </div>
 
     <!-- EARN PAGE -->
-   <div class="card p-4">
+<div class="card p-4">
   <h2 class="text-center mb-4">💎 Earn Gems</h2>
   <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
-  <div style="width:100%; height:600px; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display: flex; flex-direction: column; gap: 10px;">
-    <iframe id="offerwallFrameTorox" src="https://www.torox.com/offerwall_placeholder" style="flex: 1; border:none; border-radius: 8px;"></iframe>
-    <iframe id="offerwallFrameCPX" src="https://www.cpxinteractive.com/offerwall_placeholder" style="flex: 1; border:none; border-radius: 8px;"></iframe>
-    <iframe id="offerwallFrameAdGem" src="https://www.adgem.com/offerwall_placeholder" style="flex: 1; border:none; border-radius: 8px;"></iframe>
+  <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display: flex; flex-direction: column; gap: 10px;">
+    
+    <!-- Torox -->
+    <iframe 
+      id="offerwallFrameTorox" 
+      src="https://wall.torox.gg/your_torox_app_id?uid=USER_ID" 
+      style="height:190px; width:100%; border:none; border-radius: 8px;">
+    </iframe>
+
+    <!-- CPX Research -->
+    <iframe 
+      id="offerwallFrameCPX" 
+      src="https://offers.cpx-research.com/index.php?app_id=YOUR_APP_ID&ext_user_id=USER_ID" 
+      style="height:190px; width:100%; border:none; border-radius: 8px;">
+    </iframe>
+
+    <!-- AdGem -->
+    <iframe 
+      id="offerwallFrameAdGem" 
+      src="https://api.adgem.com/v1/wall?appid=YOUR_APP_ID&playerid=USER_ID" 
+      style="height:190px; width:100%; border:none; border-radius: 8px;">
+    </iframe>
+
   </div>
 </div>
 
