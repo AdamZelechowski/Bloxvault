@@ -10,7 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
-    body { display: none; background-color: #ff7700; font-family: 'Segoe UI', sans-serif; }
+    body { display: none; background: #ff7700; font-family: 'Segoe UI', sans-serif; color: #fff; }
     .navbar { background-color: #2c2c2c; }
     .navbar-brand { color: #fff !important; font-weight: bold; display: flex; align-items: center; }
     .navbar-brand img { height: 32px; margin-right: 10px; }
@@ -23,6 +23,76 @@
     #adminPanelDropdown .dropdown-item { color: #fff !important; cursor: pointer; }
     #adminPanelDropdown .dropdown-item:hover { background-color: #ff7700 !important; color: #000 !important; }
 
+    /* Enhanced Login Page Styles */
+    .login-card {
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(255, 187, 51, 0.3);
+      border-radius: 16px !important;
+      transition: transform 0.3s ease;
+    }
+    .login-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .form-floating > .form-control {
+      background-color: #1a1a1a !important;
+      border: 2px solid #444 !important;
+      color: #fff !important;
+      transition: all 0.3s ease;
+    }
+    .form-floating > .form-control:focus {
+      background-color: #222 !important;
+      border-color: #ffbb33 !important;
+      box-shadow: 0 0 0 0.25rem rgba(255, 187, 51, 0.25) !important;
+    }
+    .form-floating > label {
+      color: #fff !important;
+    }
+    .form-floating > .form-control:focus ~ label {
+      color: #ffbb33 !important;
+    }
+
+    .btn-outline-warning {
+      border-color: #ffbb33 !important;
+      color: #ffbb33 !important;
+    }
+    .btn-outline-warning:hover, .btn-outline-warning.active {
+      background-color: #ffbb33 !important;
+      border-color: #ffbb33 !important;
+      color: #000 !important;
+    }
+
+    .login-btn {
+      background: linear-gradient(45deg, #ff7700, #ffbb33) !important;
+      border: none !important;
+      font-weight: bold;
+      padding: 12px !important;
+      transition: all 0.3s ease;
+    }
+    .login-btn:hover {
+      background: linear-gradient(45deg, #ffbb33, #ff7700) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 119, 0, 0.4);
+    }
+
+    .google-btn {
+      background-color: #db4437 !important;
+      border: none !important;
+      font-weight: bold;
+      padding: 12px !important;
+      transition: all 0.3s ease;
+    }
+    .google-btn:hover {
+      background-color: #c23321 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(219, 68, 55, 0.4);
+    }
+
+    .form-check-input:checked {
+      background-color: #ffbb33 !important;
+      border-color: #ffbb33 !important;
+    }
+
     .dashboard-card {
       background-color: #2c2c2c;
       color: #fff;
@@ -30,8 +100,10 @@
       border-radius: 8px;
       padding: 20px;
       text-align: center;
+      box-shadow: 0 4px 15px rgba(255, 187, 51, 0.2);
     }
     .dashboard-card h4 { color: #ffbb33; font-weight: bold; }
+    .dashboard-card p { color: #e0e0e0; font-weight: 500; }
 
     #offerwallFrame { width: 100%; height: 100%; border: none; }
   </style>
@@ -48,15 +120,9 @@
       <button class="btn btn-link nav-link" onclick="showRedeem()"><i class="bi bi-gift-fill"></i> Redeem</button>
       <button class="btn btn-link nav-link" onclick="showEarn()"><i class="bi bi-cash-coin"></i> Earn</button>
       <div id="gemCounter" title="Your Gems"><i class="bi bi-gem"></i> <span id="gemsCount">0</span></div>
-      <div class="dropdown" id="adminPanelDropdown" style="display: none;">
-        <button class="btn dropdown-toggle rgb-chroma" type="button" data-bs-toggle="dropdown">Admin Panel</button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#" onclick="viewUsers()">View Users</a></li>
-          <li><a class="dropdown-item" href="#" onclick="viewRewardRequests()">Reward Requests</a></li>
-          <li><a class="dropdown-item" href="#" onclick="runDiagnostics()">Run Diagnostics</a></li>
-          <li><a class="dropdown-item" href="#" onclick="adminLookupUser()">User Lookup</a></li>
-        </ul>
-      </div>
+      <button class="btn btn-link nav-link rgb-chroma" id="adminPanelBtn" onclick="showAdminPanel()" style="display: none;">
+        <i class="bi bi-gear-fill"></i> Admin Panel
+      </button>
       <button class="btn btn-link nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </nav>
@@ -65,20 +131,102 @@
   <div class="container py-5">
     <!-- AUTH SECTION -->
     <div id="auth">
-      <div class="card p-4 mx-auto" style="max-width:400px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
-        <h2 class="text-center mb-4" style="color:#ffbb33;">Login or Register</h2>
-        <input id="email" type="email" placeholder="Email" class="form-control mb-2" />
-        <input id="password" type="password" placeholder="Password" class="form-control mb-2" />
-        <button class="btn btn-primary w-100 mb-2" onclick="login()">Login</button>
-        <button class="btn btn-secondary w-100 mb-2" onclick="register()">Register</button>
-        <button class="btn btn-link w-100 text-light" onclick="forgotPassword()">Forgot Password?</button>
-        <button class="btn btn-danger w-100 mt-3" onclick="googleLogin()"><i class="bi bi-google"></i> Sign in with Google</button>
+      <div class="card p-5 mx-auto login-card" style="max-width:450px; background:#2c2c2c; color:#fff; border:2px solid #ffbb33;">
+        <!-- Logo and Title -->
+        <div class="text-center mb-4">
+          <img src="https://raw.githubusercontent.com/AdamZelechowski/Bloxvault/main/BloxVault.png" alt="BloxVault Logo" class="mb-3" style="height: 60px;">
+          <h2 style="color:#ffbb33; font-weight: bold;">Welcome to BloxVault</h2>
+          <p class="mb-0" style="color: #fff; font-weight: 500;">Earn gems, redeem rewards</p>
+        </div>
+
+        <!-- Login/Register Toggle -->
+        <div class="btn-group w-100 mb-4" role="group">
+          <button type="button" class="btn btn-outline-warning active" id="loginTab" onclick="showLoginForm()">Login</button>
+          <button type="button" class="btn btn-outline-warning" id="registerTab" onclick="showRegisterForm()">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div class="form-floating mb-3">
+            <input id="email" type="email" class="form-control" placeholder="name@example.com" required>
+            <label for="email"><i class="bi bi-envelope"></i> Email Address</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input id="password" type="password" class="form-control" placeholder="Password" required>
+            <label for="password"><i class="bi bi-lock"></i> Password</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="rememberMe">
+            <label class="form-check-label" for="rememberMe" style="color: #fff;">Remember me</label>
+          </div>
+          <button class="btn btn-primary w-100 mb-3 login-btn" onclick="login()">
+            <i class="bi bi-box-arrow-in-right"></i> Sign In
+          </button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+          <div class="form-floating mb-3">
+            <input id="regEmail" type="email" class="form-control" placeholder="name@example.com" required>
+            <label for="regEmail"><i class="bi bi-envelope"></i> Email Address</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input id="regPassword" type="password" class="form-control" placeholder="Password" required>
+            <label for="regPassword"><i class="bi bi-lock"></i> Password</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input id="confirmPassword" type="password" class="form-control" placeholder="Confirm Password" required>
+            <label for="confirmPassword"><i class="bi bi-lock-fill"></i> Confirm Password</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input id="displayName" type="text" class="form-control" placeholder="Display Name" maxlength="30">
+            <label for="displayName"><i class="bi bi-person-badge"></i> Display Name (Optional)</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+            <label class="form-check-label" for="agreeTerms" style="color: #fff;">
+              I agree to the <button type="button" class="btn btn-link p-0 text-warning" data-bs-toggle="modal" data-bs-target="#termsModal" style="text-decoration: underline;">Terms of Service</button>
+            </label>
+          </div>
+          <button class="btn btn-success w-100 mb-3" onclick="register()">
+            <i class="bi bi-person-plus"></i> Create Account
+          </button>
+        </div>
+
+        <!-- Divider -->
+        <div class="text-center mb-3">
+          <span style="color: #ccc;">or continue with</span>
+        </div>
+
+        <!-- Social Login -->
+        <button class="btn btn-danger w-100 mb-3 google-btn" onclick="googleLogin()">
+          <i class="bi bi-google"></i> Sign in with Google
+        </button>
+
+        <!-- Forgot Password -->
+        <div class="text-center">
+          <button class="btn btn-link text-warning p-0" onclick="forgotPassword()">
+            <i class="bi bi-question-circle"></i> Forgot your password?
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" style="display:none;">
-      <h1 class="text-center mb-4" style="color:#fff;">Welcome to your Dashboard!</h1>
+      <h1 class="text-center mb-4" style="color:#fff;">Welcome <span id="welcomeUserName">User</span>!</h1>
+      
+      <!-- Display Name Update -->
+      <div class="card p-2 mb-3" style="background-color: #2c2c2c; color: #fff; border: 1px solid #ffbb33; max-width: 350px;">
+        <div class="d-flex align-items-center gap-2">
+          <label class="form-label mb-0" style="font-size: 0.85rem; white-space: nowrap;">Display Name:</label>
+          <input type="text" id="userDisplayName" class="form-control form-control-sm" style="background-color: #1a1a1a; color: #fff; border: 1px solid #555; font-size: 0.8rem;" maxlength="30" placeholder="Enter name">
+          <button class="btn btn-sm btn-outline-warning" onclick="updateDisplayName()" style="font-size: 0.7rem; padding: 2px 6px;">
+            <i class="bi bi-check"></i>
+          </button>
+        </div>
+      </div>
+
       <div class="row g-4">
         <div class="col-md-4">
           <div class="dashboard-card">
@@ -103,9 +251,9 @@
 
     <!-- REDEEM PAGE -->
     <div id="redeem" style="display:none;">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">🎁 Redeem Your Gems</h2>
-        <p class="text-center">Exchange your gems for Robux, crypto, and more!</p>
+      <div class="card p-4" style="background-color: #2c2c2c; color: #fff;">
+        <h2 class="text-center mb-4" style="color: #ffbb33;">🎁 Redeem Your Gems</h2>
+        <p class="text-center" style="color: #e0e0e0;">Exchange your gems for Robux, crypto, and more!</p>
         <div class="mb-3">
           <label for="rewardType" class="form-label">Choose a Reward</label>
           <select id="rewardType" class="form-select">
@@ -120,13 +268,134 @@
 
     <!-- ✅ FIXED EARN PAGE -->
     <div id="earn" style="display:none;">
-      <div class="card p-4">
-        <h2 class="text-center mb-4">💎 Earn Gems</h2>
-        <p class="text-center">Complete surveys & offers to earn gems instantly!</p>
+      <div class="card p-4" style="background-color: #2c2c2c; color: #fff;">
+        <h2 class="text-center mb-4" style="color: #ffbb33;">💎 Earn Gems</h2>
+        <p class="text-center" style="color: #e0e0e0;">Complete surveys & offers to earn gems instantly!</p>
         <div style="width:100%; border:2px solid #ffbb33; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; gap:10px;">
           <iframe id="offerwallFrameTorox" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
           <iframe id="offerwallFrameCPX" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
           <iframe id="offerwallFrameAdGem" style="height:190px; width:100%; border:none; border-radius:8px;"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" style="display:none;">
+      <div class="card p-4" style="background-color: #2c2c2c; color: #fff; border: 2px solid #ffbb33;">
+        <h2 class="text-center mb-4" style="color: #ffbb33;">🔧 Admin Panel</h2>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <button class="btn btn-primary w-100" onclick="loadUsersData()">
+              <i class="bi bi-people-fill"></i> Load All Users
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-warning w-100" onclick="loadRewardRequests()">
+              <i class="bi bi-gift-fill"></i> Reward Requests
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-info w-100" onclick="runDiagnostics()">
+              <i class="bi bi-graph-up"></i> Run Diagnostics
+            </button>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-success w-100" onclick="showUserLookup()">
+              <i class="bi bi-search"></i> User Lookup
+            </button>
+          </div>
+        </div>
+
+        <!-- User Lookup Section -->
+        <div id="userLookupSection" style="display: none;" class="mb-4">
+          <div class="card p-3" style="background-color: #1a1a1a; border: 1px solid #444;">
+            <h5 style="color: #ffbb33;">🔍 User Lookup</h5>
+            <div class="input-group mb-3">
+              <input type="text" id="lookupEmail" class="form-control" placeholder="Enter user email..." style="background-color: #333; color: #fff; border: 1px solid #555;">
+              <button class="btn btn-outline-warning" onclick="lookupUser()">Search</button>
+            </div>
+            <div id="lookupResults"></div>
+          </div>
+        </div>
+
+        <!-- Data Display Area -->
+        <div class="card p-3" style="background-color: #1a1a1a; border: 1px solid #444; min-height: 400px;">
+          <div id="adminContent" style="color: #e0e0e0; font-family: monospace; white-space: pre-wrap; font-size: 14px;">
+            Welcome to the Admin Panel. Click a button above to load data.
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-3 mt-3">
+          <div class="col-md-4">
+            <button class="btn btn-outline-danger w-100" onclick="viewFirebaseAuthConsole()">
+              <i class="bi bi-box-arrow-up-right"></i> Firebase Console
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-warning w-100" onclick="analyzeData()">
+              <i class="bi bi-bar-chart"></i> Data Analysis
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-info w-100" onclick="exportData()">
+              <i class="bi bi-download"></i> Export Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms of Service Modal -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="background-color: #2c2c2c; color: #fff; border: 2px solid #ffbb33;">
+        <div class="modal-header" style="border-bottom: 1px solid #ffbb33;">
+          <h5 class="modal-title" id="termsModalLabel" style="color: #ffbb33;">
+            <i class="bi bi-file-earmark-text"></i> Terms of Service
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+          <h6 style="color: #ffbb33;">1. Acceptance of Terms</h6>
+          <p>By using BloxVault, you agree to comply with and be bound by these Terms of Service.</p>
+          
+          <h6 style="color: #ffbb33;">2. Service Description</h6>
+          <p>BloxVault is a rewards platform where users can earn "gems" by completing offers and surveys, which can be redeemed for various rewards including Robux and cryptocurrency.</p>
+          
+          <h6 style="color: #ffbb33;">3. User Responsibilities</h6>
+          <p>Users must:</p>
+          <ul>
+            <li>Provide accurate information during registration</li>
+            <li>Complete offers legitimately without using bots or fraudulent methods</li>
+            <li>Not create multiple accounts</li>
+            <li>Be at least 13 years old or have parental consent</li>
+          </ul>
+          
+          <h6 style="color: #ffbb33;">4. Rewards and Gems</h6>
+          <p>Gems have no cash value and can only be redeemed through our platform. We reserve the right to adjust gem values and reward availability.</p>
+          
+          <h6 style="color: #ffbb33;">5. Account Termination</h6>
+          <p>We may suspend or terminate accounts for violations of these terms, fraudulent activity, or at our discretion.</p>
+          
+          <h6 style="color: #ffbb33;">6. Privacy</h6>
+          <p>We collect and use personal information as outlined in our Privacy Policy. We do not sell personal data to third parties.</p>
+          
+          <h6 style="color: #ffbb33;">7. Limitation of Liability</h6>
+          <p>BloxVault is provided "as is" without warranties. We are not liable for any damages arising from use of our service.</p>
+          
+          <h6 style="color: #ffbb33;">8. Changes to Terms</h6>
+          <p>We may update these terms at any time. Continued use constitutes acceptance of modified terms.</p>
+          
+          <p><small class="text-muted">Last updated: January 2025</small></p>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid #ffbb33;">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" onclick="acceptTerms()" data-bs-dismiss="modal">
+            <i class="bi bi-check-circle"></i> I Accept
+          </button>
         </div>
       </div>
     </div>
@@ -167,28 +436,63 @@
         dash.style.display = "block";
         redeem.style.display = "none";
         earn.style.display = "none";
-        adminPanel.style.display = (user.email === "zelechowskiadam3@gmail.com") ? "block" : "none";
+        document.getElementById("adminPanelBtn").style.display = (user.email === "zelechowskiadam3@gmail.com") ? "block" : "none";
 
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
-          const points = userDoc.exists() ? (userDoc.data().points || 0) : 0;
-          gemsCountSpan.textContent = points;
-          dashboardGems.textContent = points + " Gems";
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const points = userData.points || 0;
+            gemsCountSpan.textContent = points;
+            dashboardGems.textContent = points + " Gems";
+            
+            // Update profile information
+            const displayName = userData.displayName || "Anonymous User";
+            document.getElementById("welcomeUserName").textContent = displayName;
+            document.getElementById("userDisplayName").value = userData.displayName || "";
+            document.getElementById("userEmail").textContent = userData.email || user.email;
+            document.getElementById("joinDate").textContent = userData.joinDate ? 
+              new Date(userData.joinDate.seconds * 1000).toLocaleDateString() : "Unknown";
+            document.getElementById("lastLogin").textContent = userData.lastLogin ? 
+              new Date(userData.lastLogin.seconds * 1000).toLocaleDateString() : "Unknown";
+          } else {
+            gemsCountSpan.textContent = "0";
+            dashboardGems.textContent = "0 Gems";
+            document.getElementById("welcomeUserName").textContent = "User";
+            document.getElementById("userEmail").textContent = user.email;
+          }
         } catch {
           gemsCountSpan.textContent = "0";
           dashboardGems.textContent = "0 Gems";
+          document.getElementById("welcomeUserName").textContent = "User";
         }
 
         loadOfferwall(user);
+
+        // Listen for user data updates
+        const { onSnapshot, doc } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        onSnapshot(doc(db, "users", user.uid), (doc) => {
+          if (doc.exists()) {
+            const userData = doc.data();
+            const points = userData.points || 0;
+            gemsCountSpan.textContent = points;
+            dashboardGems.textContent = points + " Gems";
+            
+            const displayName = userData.displayName || "Anonymous User";
+            document.getElementById("welcomeUserName").textContent = displayName;
+            document.getElementById("userDisplayName").value = userData.displayName || "";
+          }
+        });
       } else {
         authUI.style.display = "block";
         navbar.style.display = "none";
         dash.style.display = "none";
         redeem.style.display = "none";
         earn.style.display = "none";
-        adminPanel.style.display = "none";
+        document.getElementById("adminPanelBtn").style.display = "none";
         gemsCountSpan.textContent = "0";
         dashboardGems.textContent = "0 Gems";
+        document.getElementById("welcomeUserName").textContent = "User";
       }
       document.body.style.display = "block";
     });
@@ -204,16 +508,88 @@
       if (adgem) adgem.src = `https://api.adgem.com/v1/wall?appid=YOUR_ADGEM_APP_ID&playerid=${user.uid}`;
     };
 
-    window.login = () => {
+    window.login = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        // Success handled by onAuthStateChanged
+      } catch (error) {
+        alert("Login error: " + error.message);
+      }
     };
 
-    window.register = () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    window.showLoginForm = () => {
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("registerForm").style.display = "none";
+      document.getElementById("loginTab").classList.add("active");
+      document.getElementById("registerTab").classList.remove("active");
+    };
+
+    window.showRegisterForm = () => {
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("registerForm").style.display = "block";
+      document.getElementById("loginTab").classList.remove("active");
+      document.getElementById("registerTab").classList.add("active");
+    };
+
+    window.register = async () => {
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const displayName = document.getElementById("displayName").value.trim();
+      const agreeTerms = document.getElementById("agreeTerms").checked;
+
+      if (!email || !password) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+      }
+
+      if (!agreeTerms) {
+        alert("Please agree to the Terms of Service.");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          email: email,
+          displayName: displayName || null,
+          points: 100, // Welcome bonus
+          joinDate: new Date(),
+          lastLogin: new Date(),
+          provider: 'email'
+        });
+
+        alert("🎉 Account created successfully! Welcome bonus: 100 gems!");
+        
+        // Clear form
+        document.getElementById("regEmail").value = "";
+        document.getElementById("regPassword").value = "";
+        document.getElementById("confirmPassword").value = "";
+        document.getElementById("displayName").value = "";
+        document.getElementById("agreeTerms").checked = false;
+      } catch (error) {
+        alert("Registration error: " + error.message);
+      }
     };
 
     window.logout = () => signOut(auth);
@@ -222,28 +598,57 @@
       dash.style.display = "block";
       redeem.style.display = "none";
       earn.style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
     };
 
     window.showRedeem = () => {
       dash.style.display = "none";
       redeem.style.display = "block";
       earn.style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
     };
 
     window.showEarn = () => {
       dash.style.display = "none";
       redeem.style.display = "none";
       earn.style.display = "block";
+      document.getElementById("adminPanel").style.display = "none";
     };
 
-    window.requestReward = () => {
+    window.showAdminPanel = () => {
+      dash.style.display = "none";
+      redeem.style.display = "none";
+      earn.style.display = "none";
+      document.getElementById("adminPanel").style.display = "block";
+    };
+
+    window.requestReward = async () => {
       const type = document.getElementById("rewardType").value;
       const details = document.getElementById("rewardDetails").value.trim();
       if (!details) {
         alert("Please enter your username or wallet address.");
         return;
       }
-      alert(`Requested ${type} reward for ${details}`);
+
+      try {
+        const user = auth.currentUser;
+        const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+
+        await setDoc(doc(db, "rewardRequests", `${user.uid}-${Date.now()}`), {
+          uid: user.uid,
+          email: user.email,
+          rewardType: type,
+          rewardDetails: details,
+          status: "pending",
+          timestamp: new Date(),
+          gems: parseInt(gemsCountSpan.textContent) || 0
+        });
+
+        alert(`${type} reward request submitted successfully!`);
+        document.getElementById("rewardDetails").value = "";
+      } catch (error) {
+        alert("Error submitting request: " + error.message);
+      }
     };
 
     window.forgotPassword = () => {
@@ -255,9 +660,438 @@
       }
     };
 
-    window.googleLogin = () => {
+    window.googleLogin = async () => {
       const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider).catch(err => alert(err.message));
+      provider.addScope('profile');
+      provider.addScope('email');
+      
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        // Create user document if it doesn't exist
+        const { setDoc, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (!userDoc.exists()) {
+          await setDoc(doc(db, "users", user.uid), {
+            email: user.email,
+            displayName: user.displayName,
+            points: 100, // Welcome bonus
+            joinDate: new Date(),
+            lastLogin: new Date(),
+            provider: 'google'
+          });
+          alert("🎉 Welcome to BloxVault! You've received 100 gems as a welcome bonus!");
+        } else {
+          // Update last login
+          await setDoc(doc(db, "users", user.uid), {
+            lastLogin: new Date()
+          }, { merge: true });
+        }
+      } catch (error) {
+        console.error("Google login error:", error);
+        if (error.code === 'auth/unauthorized-domain') {
+          alert("⚠️ Google login needs to be configured. Please add this domain to your Firebase authorized domains:\n\n1. Go to Firebase Console\n2. Authentication > Settings > Authorized domains\n3. Add: " + window.location.hostname + "\n\nFor now, please use email/password login.");
+        } else if (error.code === 'auth/popup-blocked') {
+          alert("Popup was blocked. Please enable popups for this site and try again.");
+        } else if (error.code === 'auth/popup-closed-by-user') {
+          alert("Login was cancelled.");
+        } else {
+          alert("Google login failed: " + error.message);
+        }
+      }
+    };
+
+    // Enhanced Admin Panel Functions
+    window.loadUsersData = async () => {
+      document.getElementById("adminContent").textContent = "Loading users data...";
+      
+      try {
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        
+        let output = `🔥 BLOXVAULT USER DATABASE\n`;
+        output += `===============================\n\n`;
+        
+        // Current Auth User Info
+        if (auth.currentUser) {
+          output += `👤 CURRENT AUTHENTICATED USER:\n`;
+          output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          output += `UID: ${auth.currentUser.uid}\n`;
+          output += `Email: ${auth.currentUser.email || 'N/A'}\n`;
+          output += `Email Verified: ${auth.currentUser.emailVerified ? '✅ YES' : '❌ NO'}\n`;
+          output += `Display Name: ${auth.currentUser.displayName || 'N/A'}\n`;
+          output += `Provider: ${auth.currentUser.providerData.map(p => p.providerId).join(', ')}\n`;
+          output += `Created: ${auth.currentUser.metadata.creationTime}\n`;
+          output += `Last Sign In: ${auth.currentUser.metadata.lastSignInTime}\n\n`;
+        }
+        
+        // Firestore Users
+        const usersSnap = await getDocs(collection(db, "users"));
+        output += `📊 FIRESTORE USER RECORDS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+        
+        let userCount = 0;
+        let totalGems = 0;
+        let emailProviders = {};
+        
+        usersSnap.forEach(doc => {
+          const data = doc.data();
+          userCount++;
+          totalGems += data.points || 0;
+          
+          const provider = data.provider || 'email';
+          emailProviders[provider] = (emailProviders[provider] || 0) + 1;
+          
+          output += `${userCount}. USER RECORD\n`;
+          output += `   UID: ${doc.id}\n`;
+          output += `   📧 Email: ${data.email || 'N/A'}\n`;
+          output += `   👤 Name: ${data.displayName || 'N/A'}\n`;
+          output += `   💎 Gems: ${data.points || 0}\n`;
+          output += `   🔐 Provider: ${provider}\n`;
+          output += `   📅 Joined: ${data.joinDate ? new Date(data.joinDate.seconds * 1000).toLocaleDateString() : 'Unknown'}\n`;
+          output += `   ⏰ Last Login: ${data.lastLogin ? new Date(data.lastLogin.seconds * 1000).toLocaleDateString() : 'Unknown'}\n`;
+          
+          if (auth.currentUser && doc.id === auth.currentUser.uid) {
+            output += `   🟢 STATUS: CURRENTLY LOGGED IN\n`;
+          }
+          output += `\n`;
+        });
+        
+        // Summary Statistics
+        output += `📈 PLATFORM STATISTICS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `Total Users: ${userCount}\n`;
+        output += `Total Gems in System: ${totalGems.toLocaleString()}\n`;
+        output += `Average Gems per User: ${userCount > 0 ? Math.round(totalGems / userCount) : 0}\n`;
+        output += `Active Session: ${auth.currentUser ? '🟢 YES' : '🔴 NO'}\n\n`;
+        
+        output += `🔐 AUTHENTICATION METHODS:\n`;
+        for (const [provider, count] of Object.entries(emailProviders)) {
+          output += `${provider}: ${count} users\n`;
+        }
+        
+        output += `\n⚠️ IMPORTANT NOTES:\n`;
+        output += `• Firebase Auth has separate user management\n`;
+        output += `• Check Firebase Console for complete auth data\n`;
+        output += `• This shows only Firestore user profiles\n`;
+        
+        document.getElementById("adminContent").textContent = output;
+      } catch (error) {
+        document.getElementById("adminContent").textContent = `Error loading users: ${error.message}`;
+      }
+    };
+
+    window.loadRewardRequests = async () => {
+      document.getElementById("adminContent").textContent = "Loading reward requests...";
+      
+      try {
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        const requestsSnap = await getDocs(collection(db, "rewardRequests"));
+        
+        let output = `🎁 REWARD REQUESTS MANAGEMENT\n`;
+        output += `===============================\n\n`;
+        
+        let requestCount = 0;
+        let pendingCount = 0;
+        let completedCount = 0;
+        let totalGemsRequested = 0;
+        
+        if (requestsSnap.empty) {
+          output += `No reward requests found.\n`;
+        } else {
+          requestsSnap.forEach(doc => {
+            const data = doc.data();
+            requestCount++;
+            totalGemsRequested += data.gems || 0;
+            
+            if (data.status === 'pending') pendingCount++;
+            else if (data.status === 'completed') completedCount++;
+            
+            output += `${requestCount}. REQUEST ID: ${doc.id}\n`;
+            output += `   👤 User: ${data.email || 'N/A'}\n`;
+            output += `   🎯 Type: ${data.rewardType || 'N/A'}\n`;
+            output += `   📝 Details: ${data.rewardDetails || 'N/A'}\n`;
+            output += `   📊 Status: ${data.status?.toUpperCase() || 'UNKNOWN'}\n`;
+            output += `   💎 Gems: ${data.gems || 0}\n`;
+            output += `   📅 Requested: ${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString() : 'Unknown'}\n\n`;
+          });
+        }
+        
+        output += `📊 REQUEST STATISTICS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `Total Requests: ${requestCount}\n`;
+        output += `🟡 Pending: ${pendingCount}\n`;
+        output += `🟢 Completed: ${completedCount}\n`;
+        output += `💎 Total Gems Requested: ${totalGemsRequested.toLocaleString()}\n`;
+        
+        document.getElementById("adminContent").textContent = output;
+      } catch (error) {
+        document.getElementById("adminContent").textContent = `Error loading requests: ${error.message}`;
+      }
+    };
+
+    window.runDiagnostics = () => {
+      let output = `🔧 BLOXVAULT SYSTEM DIAGNOSTICS\n`;
+      output += `===============================\n\n`;
+      
+      output += `🔥 FIREBASE CONNECTION:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `App Initialized: ${app ? '✅ YES' : '❌ NO'}\n`;
+      output += `Auth Service: ${auth ? '✅ CONNECTED' : '❌ DISCONNECTED'}\n`;
+      output += `Firestore DB: ${db ? '✅ CONNECTED' : '❌ DISCONNECTED'}\n`;
+      output += `Project ID: ${app?.options?.projectId || 'N/A'}\n\n`;
+      
+      output += `👤 USER SESSION:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `User Logged In: ${auth.currentUser ? '✅ YES' : '❌ NO'}\n`;
+      output += `Current User: ${auth.currentUser?.email || 'None'}\n`;
+      output += `Session UID: ${auth.currentUser?.uid || 'None'}\n`;
+      output += `Email Verified: ${auth.currentUser?.emailVerified ? '✅ YES' : '❌ NO'}\n\n`;
+      
+      output += `💎 GEM SYSTEM:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `Current User Gems: ${gemsCountSpan.textContent}\n`;
+      output += `Gem Counter Element: ${gemsCountSpan ? '✅ FOUND' : '❌ MISSING'}\n`;
+      output += `Dashboard Gems: ${dashboardGems?.textContent || 'N/A'}\n\n`;
+      
+      output += `🌐 SYSTEM INFO:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `Current URL: ${window.location.href}\n`;
+      output += `User Agent: ${navigator.userAgent.substring(0, 80)}...\n`;
+      output += `Page Load Time: ${Date.now()}ms since epoch\n`;
+      output += `Local Storage Available: ${typeof(Storage) !== "undefined" ? '✅ YES' : '❌ NO'}\n`;
+      output += `Cookies Enabled: ${navigator.cookieEnabled ? '✅ YES' : '❌ NO'}\n\n`;
+      
+      output += `🎯 OFFERWALL STATUS:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `Torox Frame: ${document.getElementById('offerwallFrameTorox') ? '✅ LOADED' : '❌ MISSING'}\n`;
+      output += `CPX Frame: ${document.getElementById('offerwallFrameCPX') ? '✅ LOADED' : '❌ MISSING'}\n`;
+      output += `AdGem Frame: ${document.getElementById('offerwallFrameAdGem') ? '✅ LOADED' : '❌ MISSING'}\n\n`;
+      
+      output += `⚠️ ADMIN ACCESS:\n`;
+      output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      output += `Admin Email: zelechowskiadam3@gmail.com\n`;
+      output += `Current User is Admin: ${auth.currentUser?.email === "zelechowskiadam3@gmail.com" ? '✅ YES' : '❌ NO'}\n`;
+      output += `Admin Panel Visible: ${document.getElementById("adminPanelBtn")?.style.display !== "none" ? '✅ YES' : '❌ NO'}\n`;
+      
+      document.getElementById("adminContent").textContent = output;
+    };
+
+    window.showUserLookup = () => {
+      document.getElementById("userLookupSection").style.display = "block";
+      document.getElementById("lookupEmail").focus();
+    };
+
+    window.lookupUser = async () => {
+      const email = document.getElementById("lookupEmail").value.trim();
+      if (!email) {
+        document.getElementById("lookupResults").innerHTML = '<div class="alert alert-warning">Please enter an email address.</div>';
+        return;
+      }
+
+      try {
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        const usersSnap = await getDocs(collection(db, "users"));
+        let found = false;
+        let results = "";
+
+        usersSnap.forEach(doc => {
+          const data = doc.data();
+          if (data.email && data.email.toLowerCase() === email.toLowerCase()) {
+            found = true;
+            results = `
+              <div class="alert alert-success">
+                <h6><i class="bi bi-person-check"></i> User Found!</h6>
+                <strong>UID:</strong> ${doc.id}<br>
+                <strong>Email:</strong> ${data.email}<br>
+                <strong>Display Name:</strong> ${data.displayName || 'N/A'}<br>
+                <strong>💎 Gems:</strong> ${data.points || 0}<br>
+                <strong>🔐 Provider:</strong> ${data.provider || 'email'}<br>
+                <strong>📅 Joined:</strong> ${data.joinDate ? new Date(data.joinDate.seconds * 1000).toLocaleDateString() : 'Unknown'}<br>
+                <strong>⏰ Last Login:</strong> ${data.lastLogin ? new Date(data.lastLogin.seconds * 1000).toLocaleDateString() : 'Unknown'}
+              </div>
+            `;
+          }
+        });
+
+        if (!found) {
+          results = '<div class="alert alert-danger"><i class="bi bi-person-x"></i> User not found with that email address.</div>';
+        }
+
+        document.getElementById("lookupResults").innerHTML = results;
+      } catch (error) {
+        document.getElementById("lookupResults").innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+      }
+    };
+
+    window.viewFirebaseAuthConsole = () => {
+      window.open("https://console.firebase.google.com/project/bloxvault-d1ff0/authentication/users", "_blank");
+    };
+
+    window.analyzeData = async () => {
+      document.getElementById("adminContent").textContent = "Analyzing platform data...";
+      
+      try {
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        const usersSnap = await getDocs(collection(db, "users"));
+        const requestsSnap = await getDocs(collection(db, "rewardRequests"));
+        
+        let output = `📊 BLOXVAULT DATA ANALYSIS\n`;
+        output += `===============================\n\n`;
+        
+        // User Analysis
+        let totalUsers = 0;
+        let totalGems = 0;
+        let emailUsers = 0;
+        let googleUsers = 0;
+        let usersWithNames = 0;
+        let gemsDistribution = [];
+        
+        usersSnap.forEach(doc => {
+          const data = doc.data();
+          totalUsers++;
+          totalGems += data.points || 0;
+          gemsDistribution.push(data.points || 0);
+          
+          if (data.provider === 'google') googleUsers++;
+          else emailUsers++;
+          
+          if (data.displayName) usersWithNames++;
+        });
+        
+        // Request Analysis
+        let totalRequests = 0;
+        let pendingRequests = 0;
+        let gemsInRequests = 0;
+        let rewardTypes = {};
+        
+        requestsSnap.forEach(doc => {
+          const data = doc.data();
+          totalRequests++;
+          gemsInRequests += data.gems || 0;
+          
+          if (data.status === 'pending') pendingRequests++;
+          
+          const type = data.rewardType || 'Unknown';
+          rewardTypes[type] = (rewardTypes[type] || 0) + 1;
+        });
+        
+        // Calculate statistics
+        const avgGems = totalUsers > 0 ? Math.round(totalGems / totalUsers) : 0;
+        const medianGems = gemsDistribution.length > 0 ? gemsDistribution.sort((a, b) => a - b)[Math.floor(gemsDistribution.length / 2)] : 0;
+        const maxGems = Math.max(...gemsDistribution, 0);
+        const minGems = Math.min(...gemsDistribution, 0);
+        
+        output += `👥 USER ANALYTICS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `Total Users: ${totalUsers}\n`;
+        output += `📧 Email Users: ${emailUsers} (${totalUsers > 0 ? Math.round(emailUsers/totalUsers*100) : 0}%)\n`;
+        output += `🔍 Google Users: ${googleUsers} (${totalUsers > 0 ? Math.round(googleUsers/totalUsers*100) : 0}%)\n`;
+        output += `👤 Users with Display Names: ${usersWithNames}\n\n`;
+        
+        output += `💎 GEMS ANALYSIS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `Total Gems in System: ${totalGems.toLocaleString()}\n`;
+        output += `Average Gems per User: ${avgGems}\n`;
+        output += `Median Gems: ${medianGems}\n`;
+        output += `Highest Gems: ${maxGems}\n`;
+        output += `Lowest Gems: ${minGems}\n`;
+        output += `Gems Pending in Requests: ${gemsInRequests}\n\n`;
+        
+        output += `🎁 REWARD REQUESTS:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `Total Requests: ${totalRequests}\n`;
+        output += `Pending Requests: ${pendingRequests}\n`;
+        output += `Request Fulfillment Rate: ${totalRequests > 0 ? Math.round((totalRequests - pendingRequests) / totalRequests * 100) : 0}%\n\n`;
+        
+        if (Object.keys(rewardTypes).length > 0) {
+          output += `Most Popular Rewards:\n`;
+          for (const [type, count] of Object.entries(rewardTypes)) {
+            output += `${type}: ${count} requests\n`;
+          }
+        }
+        
+        output += `\n📈 PLATFORM HEALTH:\n`;
+        output += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        output += `User Engagement: ${totalRequests > 0 ? 'Active' : 'Low'}\n`;
+        output += `Gems Economy: ${totalGems > 1000 ? 'Healthy' : 'Growing'}\n`;
+        output += `Support Load: ${pendingRequests > 5 ? 'High' : 'Manageable'}\n`;
+        
+        document.getElementById("adminContent").textContent = output;
+      } catch (error) {
+        document.getElementById("adminContent").textContent = `Error analyzing data: ${error.message}`;
+      }
+    };
+
+    window.exportData = async () => {
+      try {
+        const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        const usersSnap = await getDocs(collection(db, "users"));
+        const requestsSnap = await getDocs(collection(db, "rewardRequests"));
+        
+        let csvData = "User Export - BloxVault\\n";
+        csvData += "UID,Email,DisplayName,Gems,Provider,JoinDate,LastLogin\\n";
+        
+        usersSnap.forEach(doc => {
+          const data = doc.data();
+          csvData += `"${doc.id}","${data.email || ''}","${data.displayName || ''}","${data.points || 0}","${data.provider || 'email'}","${data.joinDate ? new Date(data.joinDate.seconds * 1000).toISOString() : ''}","${data.lastLogin ? new Date(data.lastLogin.seconds * 1000).toISOString() : ''}"\\n`;
+        });
+        
+        csvData += "\\n\\nReward Requests Export\\n";
+        csvData += "RequestID,UserEmail,RewardType,Details,Status,Gems,Timestamp\\n";
+        
+        requestsSnap.forEach(doc => {
+          const data = doc.data();
+          csvData += `"${doc.id}","${data.email || ''}","${data.rewardType || ''}","${data.rewardDetails || ''}","${data.status || ''}","${data.gems || 0}","${data.timestamp ? new Date(data.timestamp.seconds * 1000).toISOString() : ''}"\\n`;
+        });
+        
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `bloxvault-export-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        
+        document.getElementById("adminContent").textContent = "✅ Data exported successfully! Check your downloads folder.";
+      } catch (error) {
+        document.getElementById("adminContent").textContent = `Error exporting data: ${error.message}`;
+      }
+    };
+
+    window.acceptTerms = () => {
+      document.getElementById("agreeTerms").checked = true;
+    };
+
+    window.updateDisplayName = async () => {
+      const newDisplayName = document.getElementById("userDisplayName").value.trim();
+      
+      if (newDisplayName.length > 30) {
+        alert("Display name must be 30 characters or less.");
+        return;
+      }
+
+      if (!auth.currentUser) {
+        alert("You must be logged in to update your display name.");
+        return;
+      }
+
+      try {
+        const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js");
+        
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          displayName: newDisplayName || null,
+          lastLogin: new Date()
+        }, { merge: true });
+
+        alert("✅ Display name updated successfully!");
+        
+        // Update welcome message immediately
+        document.getElementById("welcomeUserName").textContent = newDisplayName || "Anonymous User";
+      } catch (error) {
+        alert("Error updating display name: " + error.message);
+      }
     };
   </script>
 
