@@ -1,79 +1,30 @@
-<style>
-  body {
-    background-color: #121212; /* Slightly lighter black */
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-  }
+:root { --accent: #ff7700; --accent-hover: #ff9933; }
 
-  .navbar {
-    background-color: #ff7700; /* Brighter orange */
-    box-shadow: 0 2px 6px rgba(255, 119, 0, 0.5);
-  }
+body { background: #121212; }
+.narrow { max-width: 420px; }
 
-  .navbar-brand,
-  .nav-link,
-  .btn-link {
-    color: #fff !important;
-    text-shadow: 0 0 5px rgba(255, 119, 0, 0.8);
-    font-weight: 600;
-  }
+.navbar { background: #1a1a1a; border-bottom: 2px solid var(--accent); }
+.navbar-brand { color: var(--accent); }
 
-  .nav-link:hover,
-  .btn-link:hover {
-    color: #ff9933 !important; /* lighter orange on hover */
-    text-shadow: 0 0 10px #ff9933;
-  }
+.card { background: #1e1e1e; border: 1px solid var(--accent); border-radius: 12px; }
 
-  .card {
-    background-color: #1e1e1e; /* lighter than before for contrast */
-    border-radius: 12px;
-    border: 1px solid #ff7700;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(255, 119, 0, 0.3);
-  }
+.btn-primary {
+  --bs-btn-color: #000;
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: #000;
+  --bs-btn-hover-bg: var(--accent-hover);
+  --bs-btn-hover-border-color: var(--accent-hover);
+  --bs-btn-active-color: #000;
+  --bs-btn-active-bg: var(--accent-hover);
+  --bs-btn-active-border-color: var(--accent-hover);
+}
+.btn-link { --bs-btn-color: var(--accent); --bs-btn-hover-color: var(--accent-hover); }
 
-  .btn-primary {
-    background-color: #ff7700;
-    border: none;
-    font-weight: 600;
-    box-shadow: 0 0 8px #ff9933;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  }
+:root { --bs-link-color-rgb: 255, 119, 0; --bs-link-hover-color-rgb: 255, 153, 51; }
+.narrow-text { max-width: 60ch; }
+.tool-card { text-decoration: none; color: inherit; }
+.tool-card:hover, .tool-card:focus-visible { border-color: var(--accent-hover); }
 
-  .btn-primary:hover,
-  .btn-primary:focus {
-    background-color: #ff9933;
-    box-shadow: 0 0 14px #ffbb66;
-  }
-
-  .logo {
-    max-width: 150px;
-    filter: drop-shadow(0 0 3px #ff7700);
-  }
-
-  input.form-control,
-  select.form-select {
-    background-color: #2a2a2a;
-    border: 1px solid #ff7700;
-    color: #fff;
-    box-shadow: inset 0 0 5px #ff7700;
-    transition: border-color 0.3s ease;
-  }
-
-  input.form-control:focus,
-  select.form-select:focus {
-    border-color: #ff9933;
-    box-shadow: 0 0 8px #ff9933;
-    outline: none;
-    background-color: #2e2e2e;
-    color: #fff;
-  }
-
-  h2, h4, h5 {
-    text-shadow: 0 0 6px #ff7700;
-  }
-
-  p {
-    text-shadow: 0 0 3px #cc6600;
-  }
-</style>
+summary { cursor: pointer; }
+dt { margin-top: 0.6rem; }

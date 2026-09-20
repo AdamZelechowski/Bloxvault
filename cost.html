@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D print cost and pricing calculator - BloxVault</title>
+  <meta name="description" content="Work out what a 3D print really costs: filament, electricity, failed prints, and your time. Get a price that covers marketplace fees and leaves the profit you want.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar px-3">
+    <a class="navbar-brand fw-bold" href="index.html">BloxVault</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
+      <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
+      <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <h1 class="h3">3D print cost and pricing calculator</h1>
+    <p class="text-secondary">Enter one print's weight and time. Your saved settings supply everything else.</p>
+
+    <details class="card p-3 mb-4">
+      <summary class="fw-semibold">Your settings</summary>
+      <p class="small text-secondary mt-2">Saved in this browser. The starting values are placeholders, so change them to match your printer and filament.</p>
+      <div id="settings"></div>
+    </details>
+
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="card p-4 vstack gap-3">
+          <div><label class="form-label" for="grams">Filament used (g)</label><input id="grams" class="form-control" type="number" min="0" step="1" value="50"><div class="form-text">Your slicer shows this after slicing, as filament used in grams.</div></div>
+          <div><label class="form-label" for="hours">Print time (hours)</label><input id="hours" class="form-control" type="number" min="0" step="0.25" value="4"><div class="form-text">Also shown by your slicer as print time. 1 h 30 m is 1.5 hours.</div></div>
+          <div><label class="form-label" for="labor">Your time: design, cleanup, packing (minutes)</label><input id="labor" class="form-control" type="number" min="0" step="1" value="10"><div class="form-text">Time you spend around the print: designing, removing supports, sanding, packing. Use 0 if it is just for you.</div></div>
+          <div><label class="form-label" for="other">Other costs: packaging, hardware</label><input id="other" class="form-control" type="number" min="0" step="0.01" value="0"><div class="form-text">Anything else per print: a box, bubble wrap, screws, magnets.</div></div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="card p-4">
+          <h2 class="h5">Cost breakdown</h2>
+          <table class="table table-sm mb-3"><tbody id="rows"></tbody></table>
+          <div id="result"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-5 narrow-text">
+      <h2 class="h5">How it's calculated</h2>
+      <p>Filament cost is the weight used times your price per kilogram. Electricity is your printer's average power draw times the print time times your electricity price.</p>
+      <p>The failed-print allowance spreads the cost of reprints over every good print: at a 10% failure rate, each good print carries about an 11% extra share of its filament and electricity. Your time is charged at your hourly rate.</p>
+      <p>The suggested price is set so that after marketplace fees are taken out, you keep your chosen profit share of the sale price. If fees plus profit reach 100%, no price can satisfy both, so the calculator asks you to lower one.</p>
+    </section>
+  </main>
+  <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
+
+  <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
+    import { calcCost } from "./calc.js";
+
+    const $ = (id) => document.getElementById(id);
+    const LINES = [["filament", "Filament"], ["electricity", "Electricity"], ["failures", "Failed-print allowance"],
+                   ["labor", "Your time"], ["other", "Other costs"], ["cost", "Total cost"]];
+
+    function render() {
+      const s = loadSettings();
+      const r = calcCost(s, { grams: $("grams").value, hours: $("hours").value, laborMinutes: $("labor").value, otherCost: $("other").value });
+      const money = (n) => `${s.currency}${n.toFixed(2)}`;
+      const rows = LINES.map(([key, label]) => {
+        const tr = document.createElement("tr");
+        const th = document.createElement("td"), td = document.createElement("td");
+        th.textContent = label;
+        td.textContent = money(r[key]);
+        td.className = "text-end";
+        if (key === "cost") tr.className = "fw-semibold";
+        tr.append(th, td);
+        return tr;
+      });
+      $("rows").replaceChildren(...rows);
+
+      const out = $("result");
+      out.replaceChildren();
+      const p = document.createElement("p");
+      if (r.price === null) {
+        p.className = "alert alert-warning mb-0";
+        p.textContent = "Fees and your profit share add up to 100% or more, so no price works. Lower one of them in your settings.";
+      } else {
+        p.className = "mb-0";
+        const big = document.createElement("span");
+        big.className = "fs-3 fw-bold";
+        big.textContent = money(r.price);
+        p.append("Suggested price: ", big, document.createElement("br"));
+        p.append(`Fees ${money(r.fees)} · Profit ${money(r.profit)}`);
+      }
+      out.append(p);
+    }
+
+    mountSettings($("settings"), render);
+    ["grams", "hours", "labor", "other"].forEach((id) => $(id).addEventListener("input", render));
+    render();
+  </script>
+</body>
+</html>

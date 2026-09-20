@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Will it fit? 3D print scale and fit checker - BloxVault</title>
+  <meta name="description" content="Check if a 3D model fits your printer's bed at any scale, and how much more filament and time a bigger print needs.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar px-3">
+    <a class="navbar-brand fw-bold" href="index.html">BloxVault</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
+      <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
+      <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
+    </div>
+  </nav>
+  <main class="container py-4">
+    <h1 class="h3">Will it fit? Scale and fit checker</h1>
+    <p class="text-secondary narrow-text">Use this when you download a model and aren't sure it will fit your printer, or you want to make it bigger or smaller.</p>
+    <details class="card p-3 mb-4">
+      <summary class="fw-semibold">Your settings</summary>
+      <p class="small text-secondary mt-2">Saved in this browser. Starting values are placeholders, so change them to match your printer and filament.</p>
+      <div id="settings"></div>
+    </details>
+    <div class="row g-4">
+      <div class="col-md-6"><div class="card p-4 vstack gap-3">
+        <div><button type="button" class="btn btn-sm btn-outline-light" id="example">Try an example</button></div>
+        <div><label class="form-label" for="mx">Model width (mm)</label><input id="mx" class="form-control" type="number" min="0" step="1" value="300"><div class="form-text">Your slicer shows a model's size in mm when you load it.</div></div><div><label class="form-label" for="my">Model depth (mm)</label><input id="my" class="form-control" type="number" min="0" step="1" value="120"><div class="form-text">Front to back.</div></div><div><label class="form-label" for="mz">Model height (mm)</label><input id="mz" class="form-control" type="number" min="0" step="1" value="80"><div class="form-text">Bottom to top.</div></div><div><label class="form-label" for="scale">Scale (%)</label><input id="scale" class="form-control" type="number" min="0" step="1" value="100"><div class="form-text">100 keeps the original size. 150 makes it one and a half times bigger in every direction.</div></div>
+      </div></div>
+      <div class="col-md-6"><div class="card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
+    </div>
+    <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>The tool multiplies each side of the model by the scale and compares it with your bed size, also trying the model turned 90° on the bed.</p><p>Bigger prints use much more filament and time than you might expect. Solid prints grow with the cube of the scale, and thin-walled ones closer to the square, so the tool shows a range instead of one number.</p></section>
+  </main>
+  <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
+  <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
+    import { calcFit } from "./calc.js";
+    import { showResult } from "./ui.js";
+    const $ = (id) => document.getElementById(id);
+    function render() {
+      const s = loadSettings();
+      const r = calcFit({ x: s.bedX, y: s.bedY, z: s.bedZ }, { x: $("mx").value, y: $("my").value, z: $("mz").value }, $("scale").value);
+      if (!r) return showResult("result", { kind: "secondary", headline: "Enter the model's size to see if it fits.", lines: [] });
+      const mm = (d) => `${d.x.toFixed(1)} × ${d.y.toFixed(1)} × ${d.z.toFixed(1)} mm`;
+      showResult("result", {
+        kind: r.fits ? "success" : "warning",
+        headline: r.fits ? (r.rotated ? "It fits if you turn it 90° on the bed." : "It fits.") : "It doesn't fit at this size.",
+        lines: [
+          `Size at this scale: ${mm(r.scaled)}`,
+          `Your printer: ${s.bedX} × ${s.bedY} × ${s.bedZ} mm`,
+          `Largest scale that fits: ${Math.floor(r.maxScale)}%`,
+          `Filament and print time change by about ×${r.weightLow.toFixed(2)} to ×${r.weightHigh.toFixed(2)} compared with 100%`,
+        ],
+      });
+    }
+    mountSettings($("settings"), render);
+    ["mx", "my", "mz", "scale"].forEach((id) => $(id).addEventListener("input", render));
+    $("example").addEventListener("click", () => { $("mx").value = 300; $("my").value = 120; $("mz").value = 80; $("scale").value = 100; render(); });
+    render();
+  </script>
+</body>
+</html>
