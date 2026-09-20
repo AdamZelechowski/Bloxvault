@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>G-code reader: print time, filament used, and cost - BloxVault</title>
+  <meta name="description" content="Read print time and filament used from a slicer G-code file and estimate the cost with your saved printer and filament settings. Your file stays in your browser.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar px-3">
+    <a class="navbar-brand fw-bold" href="index.html">BloxVault</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
+      <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
+      <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
+      <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
+    </div>
+  </nav>
+  <main class="container py-4">
+    <h1 class="h3">G-code reader: print time, filament used, and cost</h1>
+    <p class="text-secondary narrow-text">Use this after you slice a model. Choose the G-code file and it reads the print time and filament used, then estimates the cost with your saved setup. The file stays in your browser and is never uploaded.</p>
+    <div id="settings" class="mb-4"></div>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card p-4 vstack gap-3">
+          <div>
+            <label class="form-label" for="file">G-code file</label>
+            <input id="file" class="form-control" type="file" accept=".gcode,.gco,.g,.nc,.txt">
+            <div class="form-text">The file ends in .gcode. Not sure how to make one? See the steps below.</div>
+          </div>
+          <details>
+            <summary>If your file only lists filament length</summary>
+            <p class="small text-secondary mt-2">Then the weight is calculated from the length, the filament thickness, and the material's density. These are typical values, so check your spool.</p>
+            <div class="row g-3">
+              <div class="col-6"><label class="form-label" for="material">Material</label>
+                <select id="material" class="form-select"><option value="1.24">PLA (1.24)</option><option value="1.27">PETG (1.27)</option><option value="1.04">ABS (1.04)</option><option value="1.07">ASA (1.07)</option><option value="1.21">TPU (1.21)</option><option value="1.14">Nylon (1.14)</option></select></div>
+              <div class="col-6"><label class="form-label" for="diameter">Filament thickness</label>
+                <select id="diameter" class="form-select"><option value="1.75">1.75 mm</option><option value="2.85">2.85 mm</option></select></div>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
+    </div>
+
+    <section class="mt-5 narrow-text">
+      <h2 class="h5">How do I get a G-code file?</h2>
+      <p>G-code is the instruction file your printer follows. You make it with a slicer, which is free software.</p>
+      <ol>
+        <li>Install a free slicer: UltiMaker Cura, PrusaSlicer, or OrcaSlicer. Download it from the official site.</li>
+        <li>When it asks, add your printer by picking your model from the list. Your printer doesn't need to be connected.</li>
+        <li>Open a model: File, then Open, then choose an .stl file. Free models are on sites like Printables, Thingiverse, and MakerWorld. A small calibration cube works well.</li>
+        <li>Click Slice.</li>
+        <li>Save the result. In Cura choose Save to Disk. In PrusaSlicer choose Export G-code. In OrcaSlicer choose Export G-code file. Button names vary a little by version. If you use a Bambu Lab printer, pick the plain G-code export, not the .3mf.</li>
+      </ol>
+      <h2 class="h5 mt-4">How it works</h2>
+      <p>Slicers write summary totals into comment lines (lines starting with a semicolon), and each slicer words them a little differently. This tool reads those comments from PrusaSlicer, OrcaSlicer, Bambu Studio, and Cura files. Values it finds in the file are marked "read from file". If a file only gives filament length, the weight is worked out from the length and is marked "calculated".</p>
+      <p>Slicer estimates are usually close, but the real print time depends on your printer.</p>
+    </section>
+
+    <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="cost.html">Print cost and pricing</a><a class="btn btn-sm btn-outline-light" href="spool.html">Enough filament?</a></div></section>
+  </main>
+  <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
+  <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
+    import { calcCost } from "./calc.js";
+    import { parseGcode } from "./gcode.js";
+    import { showResult } from "./ui.js";
+    const $ = (id) => document.getElementById(id);
+    let text = "";
+
+    // Totals sit near the start or end of the file, so large files are only read at both ends.
+    async function readEnds(file) {
+      const CHUNK = 300 * 1024;
+      if (file.size <= CHUNK * 2) return file.text();
+      return (await file.slice(0, CHUNK).text()) + "\n" + (await file.slice(file.size - CHUNK).text());
+    }
+    const fmtTime = (sec) => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)} h ${m % 60} m`; };
+
+    function render() {
+      if (!text) return showResult("result", { kind: "secondary", headline: "Choose a G-code file to see the result.", lines: [] });
+      const s = loadSettings();
+      const g = parseGcode(text, { density: Number($("material").value), diameter: Number($("diameter").value) });
+      if (g.seconds === null && g.grams === null) {
+        return showResult("result", { kind: "warning", headline: "Couldn't find the print time or filament in this file.",
+          lines: ["Some slicers don't write these totals, or word them differently.", "You can still type the numbers from your slicer into the cost calculator."] });
+      }
+      const hours = g.seconds === null ? null : g.seconds / 3600;
+      const lines = [
+        `Slicer: ${g.slicer || "not recognized"}`,
+        hours === null ? "Print time: not found" : `Print time: ${fmtTime(g.seconds)} (read from file)`,
+        g.grams === null ? "Filament: not found"
+          : g.gramsFrom === "file" ? `Filament: ${g.grams.toFixed(1)} g (read from file)`
+          : `Filament: ${g.grams.toFixed(1)} g (calculated from ${(g.lengthMm / 1000).toFixed(2)} m of filament)`,
+      ];
+      const both = hours !== null && g.grams !== null;
+      if (both) {
+        const c = calcCost(s, { grams: g.grams, hours, laborMinutes: 0, otherCost: 0 });
+        lines.push(`Estimated material and electricity cost: ${s.currency}${c.cost.toFixed(2)} (before your time and extras)`);
+      }
+      showResult("result", { kind: both ? "success" : "warning", headline: both ? "Found the print details." : "Found only part of the details.", lines });
+      const params = new URLSearchParams();
+      if (g.grams !== null) params.set("grams", g.grams.toFixed(1));
+      if (hours !== null) params.set("hours", hours.toFixed(2));
+      const a = document.createElement("a");
+      a.className = "btn btn-primary mt-3";
+      a.href = `cost.html?${params}`;
+      a.textContent = "Open in the cost calculator";
+      $("result").append(a);
+    }
+
+    $("file").addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      text = file ? await readEnds(file) : "";
+      render();
+    });
+    ["material", "diameter"].forEach((id) => $(id).addEventListener("change", render));
+    mountSettings($("settings"), render);
+    render();
+  </script>
+</body>
+</html>

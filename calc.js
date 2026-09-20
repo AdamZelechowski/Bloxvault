@@ -42,5 +42,5 @@ export function calcSpool({ weighed, empty, print, bufferPct }) {
   if (p === 0 || num(weighed) === 0) return null;
   const remaining = Math.max(0, num(weighed) - num(empty));
   const needed = p * (1 + num(bufferPct, 0, 100) / 100);
-  return { remaining, needed, spare: remaining - needed, enough: remaining >= needed, printsLeft: Math.floor(remaining / needed) };
+  return { remaining, required: p, margin: needed - p, needed, spare: remaining - needed, enough: remaining >= needed, printsLeft: Math.floor(remaining / needed) };
 }

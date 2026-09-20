@@ -14,6 +14,7 @@
     <div class="d-flex flex-wrap gap-2">
       <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
       <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
       <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
       <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
     </div>
@@ -23,11 +24,7 @@
     <h1 class="h3">3D print cost and pricing calculator</h1>
     <p class="text-secondary">Enter one print's weight and time. Your saved settings supply everything else.</p>
 
-    <details class="card p-3 mb-4">
-      <summary class="fw-semibold">Your settings</summary>
-      <p class="small text-secondary mt-2">Saved in this browser. The starting values are placeholders, so change them to match your printer and filament.</p>
-      <div id="settings"></div>
-    </details>
+    <div id="settings" class="mb-4"></div>
 
     <div class="row g-4">
       <div class="col-md-5">
@@ -39,10 +36,10 @@
         </div>
       </div>
       <div class="col-md-7">
-        <div class="card p-4">
-          <h2 class="h5">Cost breakdown</h2>
-          <table class="table table-sm mb-3"><tbody id="rows"></tbody></table>
+        <div class="card result-card p-4">
+          <h2 class="h5">Result</h2>
           <div id="result"></div>
+          <details class="mt-3"><summary>Show calculation details</summary><table class="table table-sm mt-2 mb-0"><tbody id="rows"></tbody></table></details>
         </div>
       </div>
     </div>
@@ -53,6 +50,7 @@
       <p>The failed-print allowance spreads the cost of reprints over every good print: at a 10% failure rate, each good print carries about an 11% extra share of its filament and electricity. Your time is charged at your hourly rate.</p>
       <p>The suggested price is set so that after marketplace fees are taken out, you keep your chosen profit share of the sale price. If fees plus profit reach 100%, no price can satisfy both, so the calculator asks you to lower one.</p>
     </section>
+  <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="spool.html">Enough filament?</a><a class="btn btn-sm btn-outline-light" href="fit.html">Will it fit?</a><a class="btn btn-sm btn-outline-light" href="gcode.html">G-code reader</a></div></section>
   </main>
   <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
 
@@ -82,23 +80,40 @@
 
       const out = $("result");
       out.replaceChildren();
-      const p = document.createElement("p");
       if (r.price === null) {
-        p.className = "alert alert-warning mb-0";
-        p.textContent = "Fees and your profit share add up to 100% or more, so no price works. Lower one of them in your settings.";
-      } else {
-        p.className = "mb-0";
-        const big = document.createElement("span");
-        big.className = "fs-3 fw-bold";
-        big.textContent = money(r.price);
-        p.append("Suggested price: ", big, document.createElement("br"));
-        p.append(`Fees ${money(r.fees)} · Profit ${money(r.profit)}`);
+        const w = document.createElement("p");
+        w.className = "alert alert-warning mb-0";
+        w.textContent = "Fees and your profit share add up to 100% or more, so no price works. Lower one of them in your settings.";
+        out.append(w);
+        return;
       }
-      out.append(p);
+      const row = document.createElement("div");
+      row.className = "row text-center g-2";
+      for (const [label, value, big] of [["Estimated cost", r.cost, false], ["Suggested price", r.price, true], ["Estimated profit", r.profit, false]]) {
+        const col = document.createElement("div");
+        col.className = "col-4";
+        const l = document.createElement("div");
+        l.className = "small text-secondary";
+        l.textContent = label;
+        const v = document.createElement("div");
+        v.className = big ? "fs-3 fw-bold accent-text" : "fs-5";
+        v.textContent = money(value);
+        col.append(l, v);
+        row.append(col);
+      }
+      const fees = document.createElement("p");
+      fees.className = "small text-secondary text-center mt-2 mb-0";
+      fees.textContent = `Marketplace fees taken out of the price: ${money(r.fees)}`;
+      out.append(row, fees);
     }
 
     mountSettings($("settings"), render);
     ["grams", "hours", "labor", "other"].forEach((id) => $(id).addEventListener("input", render));
+    const q = new URLSearchParams(location.search);
+    for (const id of ["grams", "hours"]) {
+      const v = parseFloat(q.get(id));
+      if (Number.isFinite(v) && v >= 0) $(id).value = v;
+    }
     render();
   </script>
 </body>

@@ -14,6 +14,7 @@
     <div class="d-flex flex-wrap gap-2">
       <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
       <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
       <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
       <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
     </div>
@@ -21,6 +22,7 @@
   <main class="container py-4">
     <h1 class="h3">Enough filament? Spool check</h1>
     <p class="text-secondary narrow-text">Use this before a long print, to make sure the spool won't run out halfway.</p>
+    <div id="settings" class="mb-4"></div>
     
     <div class="row g-4">
       <div class="col-md-6"><div class="card p-4 vstack gap-3">
@@ -30,9 +32,11 @@
       <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
     </div>
     <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>Weigh the spool and subtract the empty spool's weight to get the filament left. The tool compares that with the print's weight plus your safety margin.</p></section>
+  <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="cost.html">Print cost and pricing</a><a class="btn btn-sm btn-outline-light" href="fit.html">Will it fit?</a></div></section>
   </main>
   <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
   <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
     import { calcSpool } from "./calc.js";
     import { showResult } from "./ui.js";
     const $ = (id) => document.getElementById(id);
@@ -43,9 +47,10 @@
         kind: r.enough ? "success" : "warning",
         headline: r.enough ? "There's enough filament." : "Not enough filament. Use a fresh spool.",
         lines: [
-          `Filament left on the spool: ${r.remaining.toFixed(0)} g`,
-          `This print needs: ${r.needed.toFixed(0)} g, including your margin`,
-          r.enough ? `Spare after the print: ${r.spare.toFixed(0)} g` : `Short by: ${(-r.spare).toFixed(0)} g`,
+          `Available on the spool: ${r.remaining.toFixed(0)} g`,
+          `Print needs: ${r.required.toFixed(0)} g`,
+          `Safety margin: ${r.margin.toFixed(0)} g`,
+          r.enough ? `Left after the print: ${r.spare.toFixed(0)} g` : `Short by: ${(-r.spare).toFixed(0)} g`,
           `About ${r.printsLeft} print${r.printsLeft === 1 ? "" : "s"} like this left on the spool`,
         ],
       });
@@ -66,6 +71,8 @@
     }
     ["weighed", "empty", "pg", "buf"].forEach((id) => $(id).addEventListener("input", render));
     $("example").addEventListener("click", () => { $("weighed").value = 620; $("empty").value = 200; $("pg").value = 150; $("buf").value = 10; render(); });
+    $("empty").value = loadSettings().emptySpoolGrams;
+    mountSettings($("settings"), (s) => { $("empty").value = s.emptySpoolGrams; render(); });
     render();
   </script>
 </body>

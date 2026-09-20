@@ -14,6 +14,7 @@
     <div class="d-flex flex-wrap gap-2">
       <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
       <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
       <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
       <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
     </div>
@@ -21,11 +22,7 @@
   <main class="container py-4">
     <h1 class="h3">Will it fit? Scale and fit checker</h1>
     <p class="text-secondary narrow-text">Use this when you download a model and aren't sure it will fit your printer, or you want to make it bigger or smaller.</p>
-    <details class="card p-3 mb-4">
-      <summary><span class="fw-semibold">My setup</span><span class="text-secondary ms-2" id="setupSummary"></span><span class="ms-2 accent-text">Edit</span></summary>
-      <p class="small text-secondary mt-3">Saved in this browser. Starting values are placeholders, so change them to match your printer and filament.</p>
-      <div id="settings"></div>
-    </details>
+    <div id="settings" class="mb-4"></div>
     <div class="row g-4">
       <div class="col-md-6"><div class="card p-4 vstack gap-3">
         <div><button type="button" class="btn btn-sm btn-outline-light" id="example">Try an example</button></div>
@@ -33,7 +30,8 @@
       </div></div>
       <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
     </div>
-    <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>The tool multiplies each side of the model by the scale and compares it with your bed size, also trying the model turned 90° on the bed.</p><p>Bigger prints use much more filament and time than you might expect. Solid prints grow with the cube of the scale, and thin-walled ones closer to the square, so the tool shows a range instead of one number.</p></section>
+    <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>The tool multiplies each side of the model by the scale and compares it with your bed size, also trying the model turned 90° on the bed. It only compares overall width, depth, and height, so it can't tell whether a shape will actually print well in that position.</p><p>Bigger prints use much more filament and time than you might expect. Solid prints grow with the cube of the scale, and thin-walled ones closer to the square, so the tool shows a range instead of one number.</p></section>
+  <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="spool.html">Enough filament?</a><a class="btn btn-sm btn-outline-light" href="cost.html">Print cost and pricing</a></div></section>
   </main>
   <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
   <script type="module">
@@ -56,6 +54,14 @@
           `Rough estimate only: filament and print time change by about ×${r.weightLow.toFixed(2)} to ×${r.weightHigh.toFixed(2)} compared with 100%. Your slicer gives the real numbers.`,
         ],
       });
+      if (Math.floor(r.maxScale) !== Math.round(Number($("scale").value))) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn btn-sm btn-outline-light mt-3";
+        b.textContent = `Use ${Math.floor(r.maxScale)}% (largest that fits)`;
+        b.addEventListener("click", () => { $("scale").value = Math.floor(r.maxScale); render(); });
+        $("result").append(b);
+      }
     }
     mountSettings($("settings"), render);
     ["mx", "my", "mz", "scale"].forEach((id) => $(id).addEventListener("input", render));
