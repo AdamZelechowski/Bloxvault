@@ -22,8 +22,8 @@
     <h1 class="h3">Will it fit? Scale and fit checker</h1>
     <p class="text-secondary narrow-text">Use this when you download a model and aren't sure it will fit your printer, or you want to make it bigger or smaller.</p>
     <details class="card p-3 mb-4">
-      <summary class="fw-semibold">Your settings</summary>
-      <p class="small text-secondary mt-2">Saved in this browser. Starting values are placeholders, so change them to match your printer and filament.</p>
+      <summary><span class="fw-semibold">My setup</span><span class="text-secondary ms-2" id="setupSummary"></span><span class="ms-2 accent-text">Edit</span></summary>
+      <p class="small text-secondary mt-3">Saved in this browser. Starting values are placeholders, so change them to match your printer and filament.</p>
       <div id="settings"></div>
     </details>
     <div class="row g-4">
@@ -31,7 +31,7 @@
         <div><button type="button" class="btn btn-sm btn-outline-light" id="example">Try an example</button></div>
         <div><label class="form-label" for="mx">Model width (mm)</label><input id="mx" class="form-control" type="number" min="0" step="1" value="300"><div class="form-text">Your slicer shows a model's size in mm when you load it.</div></div><div><label class="form-label" for="my">Model depth (mm)</label><input id="my" class="form-control" type="number" min="0" step="1" value="120"><div class="form-text">Front to back.</div></div><div><label class="form-label" for="mz">Model height (mm)</label><input id="mz" class="form-control" type="number" min="0" step="1" value="80"><div class="form-text">Bottom to top.</div></div><div><label class="form-label" for="scale">Scale (%)</label><input id="scale" class="form-control" type="number" min="0" step="1" value="100"><div class="form-text">100 keeps the original size. 150 makes it one and a half times bigger in every direction.</div></div>
       </div></div>
-      <div class="col-md-6"><div class="card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
+      <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
     </div>
     <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>The tool multiplies each side of the model by the scale and compares it with your bed size, also trying the model turned 90° on the bed.</p><p>Bigger prints use much more filament and time than you might expect. Solid prints grow with the cube of the scale, and thin-walled ones closer to the square, so the tool shows a range instead of one number.</p></section>
   </main>
@@ -53,7 +53,7 @@
           `Size at this scale: ${mm(r.scaled)}`,
           `Your printer: ${s.bedX} × ${s.bedY} × ${s.bedZ} mm`,
           `Largest scale that fits: ${Math.floor(r.maxScale)}%`,
-          `Filament and print time change by about ×${r.weightLow.toFixed(2)} to ×${r.weightHigh.toFixed(2)} compared with 100%`,
+          `Rough estimate only: filament and print time change by about ×${r.weightLow.toFixed(2)} to ×${r.weightHigh.toFixed(2)} compared with 100%. Your slicer gives the real numbers.`,
         ],
       });
     }

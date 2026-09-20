@@ -27,7 +27,7 @@
         <div><button type="button" class="btn btn-sm btn-outline-light" id="example">Try an example</button></div>
         <div><label class="form-label" for="weighed">Spool weight now (g)</label><input id="weighed" class="form-control" type="number" min="0" step="1" value="620"><div class="form-text">Put the spool on a kitchen scale.</div></div><div><label class="form-label" for="empty">Empty spool weight (g)</label><input id="empty" class="form-control" type="number" min="0" step="1" value="200"><div class="form-text">Varies by brand. Weigh an empty one if you can.</div></div><div><label class="form-label" for="pg">This print needs (g)</label><input id="pg" class="form-control" type="number" min="0" step="1" value="150"><div class="form-text">Your slicer shows this after slicing.</div></div><div><label class="form-label" for="buf">Safety margin (%)</label><input id="buf" class="form-control" type="number" min="0" step="1" value="10"><div class="form-text">Extra filament for purging and small errors. 10 is a fair start.</div></div>
       </div></div>
-      <div class="col-md-6"><div class="card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
+      <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
     </div>
     <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>Weigh the spool and subtract the empty spool's weight to get the filament left. The tool compares that with the print's weight plus your safety margin.</p></section>
   </main>
@@ -49,6 +49,20 @@
           `About ${r.printsLeft} print${r.printsLeft === 1 ? "" : "s"} like this left on the spool`,
         ],
       });
+      const share = r.remaining > 0 ? Math.min(100, (r.needed / r.remaining) * 100) : 100;
+      const bar = document.createElement("div");
+      bar.className = "progress mt-3";
+      bar.setAttribute("role", "progressbar");
+      bar.setAttribute("aria-label", "Share of the remaining filament this print uses");
+      bar.setAttribute("aria-valuenow", share.toFixed(0));
+      const fill = document.createElement("div");
+      fill.className = `progress-bar ${r.enough ? "bg-success" : "bg-danger"}`;
+      fill.style.width = `${share}%`;
+      bar.append(fill);
+      const cap = document.createElement("div");
+      cap.className = "small text-secondary mt-1";
+      cap.textContent = `This print uses ${share.toFixed(0)}% of the filament left on the spool.`;
+      document.getElementById("result").append(bar, cap);
     }
     ["weighed", "empty", "pg", "buf"].forEach((id) => $(id).addEventListener("input", render));
     $("example").addEventListener("click", () => { $("weighed").value = 620; $("empty").value = 200; $("pg").value = 150; $("buf").value = 10; render(); });

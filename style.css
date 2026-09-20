@@ -6,7 +6,7 @@ body { background: #121212; }
 .navbar { background: #1a1a1a; border-bottom: 2px solid var(--accent); }
 .navbar-brand { color: var(--accent); }
 
-.card { background: #1e1e1e; border: 1px solid var(--accent); border-radius: 12px; }
+.card { background: #1e1e1e; border: 1px solid #2f2f2f; border-radius: 12px; }
 
 .btn-primary {
   --bs-btn-color: #000;
@@ -28,3 +28,6 @@ body { background: #121212; }
 
 summary { cursor: pointer; }
 dt { margin-top: 0.6rem; }
+
+.result-card { border-color: var(--accent); }
+.accent-text { color: var(--accent); }

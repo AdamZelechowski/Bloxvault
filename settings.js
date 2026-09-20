@@ -28,6 +28,13 @@ export function loadSettings() {
   catch { return { ...DEFAULTS }; }
 }
 
+function showSummary(s) {
+  const el = document.getElementById("setupSummary");
+  if (!el) return;
+  el.textContent = [s.printerName || "Your printer", `${s.bedX} × ${s.bedY} × ${s.bedZ} mm`, s.filamentName || "your filament",
+    `${s.currency}${s.filamentPricePerKg}/kg`, `${s.currency}${s.electricityRate}/kWh`].join(" · ");
+}
+
 function saveSettings(s) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* storage blocked: settings last for this visit only */ }
 }
@@ -35,6 +42,7 @@ function saveSettings(s) {
 // Builds the settings form inside `container`; calls onChange(settings) after every edit.
 export function mountSettings(container, onChange = () => {}) {
   const s = loadSettings();
+  showSummary(s);
   const grid = document.createElement("div");
   grid.className = "row g-3";
   for (const [key, label, type, attrs, hint] of FIELDS) {
@@ -58,6 +66,7 @@ export function mountSettings(container, onChange = () => {}) {
         s[key] = input.value.slice(0, 40);
       }
       saveSettings(s);
+      showSummary(s);
       onChange({ ...s });
     });
     const note = document.createElement("div");
