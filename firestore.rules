@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// Rules for the cleaned-up app: profiles only, no rewards. Test in the Rules Playground before publishing.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Admin by UID only. Later upgrade: a custom claim (request.auth.token.admin == true).
+    function isAdmin() {
+      return signedIn() && request.auth.uid == 'eu5yOu5JPIQ6qOzkGDapjMrgt522';
+    }
+
+    // Display name: string, max 30 chars, no < or >.
+    function validName(v) {
+      return v == null || (v is string && v.size() <= 30 && v.matches('[^<>]*'));
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow write: if isAdmin();
+
+      // A user creates only their own profile, with only these fields and server timestamps.
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'joinDate', 'lastLogin', 'provider'])
+        && request.resource.data.email.lower() == request.auth.token.email.lower()
+        && request.resource.data.provider in ['email', 'google']
+        && request.resource.data.joinDate == request.time
+        && request.resource.data.lastLogin == request.time
+        && validName(request.resource.data.get('displayName', null));
+
+      // A user updates only displayName and lastLogin. No deletes.
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'lastLogin'])
+        && validName(request.resource.data.get('displayName', null))
+        && request.resource.data.get('lastLogin', request.time) is timestamp;
+    }
+
+    // Everything else, including the old rewardRequests collection, is denied by default.
+  }
+}

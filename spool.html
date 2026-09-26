@@ -34,7 +34,19 @@
     <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>Weigh the spool and subtract the empty spool's weight to get the filament left. The tool compares that with the print's weight plus your safety margin.</p></section>
   <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="cost.html">Print cost and pricing</a><a class="btn btn-sm btn-outline-light" href="fit.html">Will it fit?</a></div></section>
   </main>
-  <footer class="container pb-4 small text-secondary">Estimates only. Your slicer and printer have the final say.</footer>
+  <footer class="site-footer border-top mt-5">
+    <div class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3 small text-secondary">
+      <span>Estimates only. Your slicer and printer have the final say. &copy; <span id="year">2026</span> BloxVault</span>
+      <nav class="d-flex flex-wrap gap-3" aria-label="Site information">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="disclaimer.html">Disclaimer</a>
+      </nav>
+    </div>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
   <script type="module">
     import { loadSettings, mountSettings } from "./settings.js";
     import { calcSpool } from "./calc.js";
