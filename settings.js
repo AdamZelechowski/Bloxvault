@@ -77,25 +77,42 @@ const el = (tag, cls, text) => {
   return n;
 };
 
+// A fixed, hand-authored icon — never built from user input, so innerHTML is safe here.
+const PRINTER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="7" rx="1.5"/><path d="M6 16v5h12v-5"/><circle cx="17.3" cy="12.2" r=".6" fill="currentColor" stroke="none"/></svg>';
+const icon = (svg) => {
+  const span = document.createElement("span");
+  span.innerHTML = svg; // fixed constant above, not derived from any variable
+  return span.firstElementChild;
+};
+
 // Shows a compact "My setup" card; its Edit button opens the full form in a dialog.
 // Calls onChange(settings) after every edit. Returns { open } so a page can open the dialog too.
 export function mountSettings(container, onChange = () => {}) {
   const st = load();
 
-  const card = el("div", "card setup-card p-3");
-  const top = el("div", "d-flex justify-content-between align-items-start gap-3");
-  const lines = el("div");
-  const edit = el("button", "btn btn-sm btn-outline-light", "Edit setup");
+  const card = el("div", "card setup-card");
+  const iconWrap = el("span", "setup-icon");
+  iconWrap.append(icon(PRINTER_ICON));
+  const chips = el("div", "setup-chips");
+  const edit = el("button", "btn btn-sm btn-outline-light edit-btn", "Edit setup");
   edit.type = "button";
-  top.append(lines, edit);
-  card.append(el("div", "small text-secondary mb-1", "My setup"), top);
+  card.append(iconWrap, chips, edit);
+
+  const chip = (label, value) => {
+    const wrap = el("span", "setup-chip");
+    wrap.append(el("span", "label", label + " "), el("span", "value", value));
+    return wrap;
+  };
+  const sep = () => el("span", "sep d-none d-sm-inline", "·");
+
   const paint = () => {
     const s = flatten(st);
-    lines.replaceChildren(
-      el("div", "fw-semibold", s.printerName || "Your printer"),
-      el("div", "", `${s.bedX} × ${s.bedY} × ${s.bedZ} mm`),
-      el("div", "", `${s.filamentName || "Your filament"} · ${s.currency}${s.filamentPricePerKg}/kg`),
-      el("div", "text-secondary", `${s.currency}${s.electricityRate}/kWh · ${s.printerWatts} W`),
+    chips.replaceChildren(
+      chip("Printer", s.printerName || "Unnamed"), sep(),
+      chip("Bed", `${s.bedX}×${s.bedY}×${s.bedZ} mm`), sep(),
+      chip("Filament", s.filamentName || "Unnamed"), sep(),
+      chip("Material", `${s.currency}${s.filamentPricePerKg}/kg`), sep(),
+      chip("Power", `${s.currency}${s.electricityRate}/kWh`),
     );
   };
 
