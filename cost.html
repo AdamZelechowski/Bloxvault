@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D print cost and pricing calculator - BloxVault</title>
+  <meta name="description" content="Work out what a 3D print really costs: filament, electricity, failed prints, and your time. Get a price that covers marketplace fees and leaves the profit you want.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar px-3">
+    <a class="navbar-brand fw-bold" href="index.html">BloxVault</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
+      <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
+      <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
+      <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <h1 class="h3">3D print cost and pricing calculator</h1>
+    <p class="text-secondary">Enter one print's weight and time. Your saved settings supply everything else.</p>
+
+    <div id="settings" class="mb-4"></div>
+
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="card p-4 vstack gap-3">
+          <div><label class="form-label" for="grams">Filament used (g)</label><input id="grams" class="form-control" type="number" min="0" step="1" value="50" inputmode="decimal"><div class="form-text">Your slicer shows this after slicing, as filament used in grams.</div></div>
+          <div>
+            <div class="form-label">Print time</div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label" for="hours">Hours</label>
+                <input id="hours" class="form-control" type="number" min="0" step="1" value="4" inputmode="numeric">
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="minutes">Minutes</label>
+                <input id="minutes" class="form-control" type="number" min="0" max="59" step="1" value="0" inputmode="numeric">
+              </div>
+            </div>
+            <div class="form-text">From your slicer's print time. Minutes must be 0–59.</div>
+          </div>
+          <div><label class="form-label" for="labor">Your time: design, cleanup, packing (minutes)</label><input id="labor" class="form-control" type="number" min="0" step="1" value="10" inputmode="numeric"><div class="form-text">Time you spend around the print: designing, removing supports, sanding, packing. Use 0 if it is just for you.</div></div>
+          <div><label class="form-label" for="other">Other costs: packaging, hardware</label><input id="other" class="form-control" type="number" min="0" step="0.01" value="0" inputmode="decimal"><div class="form-text">Anything else per print: a box, bubble wrap, screws, magnets.</div></div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="card result-card p-4">
+          <h2 class="h5">Result</h2>
+          <div id="result"></div>
+          <details class="mt-3"><summary>Show calculation details</summary><table class="table table-sm mt-2 mb-0"><tbody id="rows"></tbody></table></details>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-5 narrow-text">
+      <h2 class="h5">How it's calculated</h2>
+      <p>Filament cost is the weight used times your price per kilogram. Electricity is your printer's average power draw times the print time times your electricity price.</p>
+      <p>The failed-print allowance spreads the cost of reprints over every good print: at a 10% failure rate, each good print carries about an 11% extra share of its filament and electricity. Your time is charged at your hourly rate.</p>
+      <p>The suggested price is set so that after marketplace fees are taken out, you keep your chosen profit share of the sale price. If fees plus profit reach 100%, no price can satisfy both, so the calculator asks you to lower one.</p>
+    </section>
+  <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="spool.html">Enough filament?</a><a class="btn btn-sm btn-outline-light" href="fit.html">Will it fit?</a><a class="btn btn-sm btn-outline-light" href="gcode.html">G-code reader</a></div></section>
+  </main>
+  <footer class="site-footer border-top mt-5">
+    <div class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3 small text-secondary">
+      <span>Estimates only. Your slicer and printer have the final say. &copy; <span id="year">2026</span> BloxVault</span>
+      <nav class="d-flex flex-wrap gap-3" aria-label="Site information">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="disclaimer.html">Disclaimer</a>
+      </nav>
+    </div>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+  <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
+    import { calcCost } from "./calc.js";
+    import { parseNumber, setFieldFeedback, hoursFromParts, splitDecimalHours } from "./ui.js";
+
+    const $ = (id) => document.getElementById(id);
+    const LINES = [["filament", "Filament"], ["electricity", "Electricity"], ["failures", "Failed-print allowance"],
+                   ["labor", "Your time"], ["other", "Other costs"], ["cost", "Total cost"]];
+
+    function readJob() {
+      const grams = parseNumber($("grams").value, { label: "Filament used" });
+      const hours = parseNumber($("hours").value, { label: "Hours", integer: true });
+      const minutes = parseNumber($("minutes").value, { min: 0, max: 59, label: "Minutes", integer: true });
+      const labor = parseNumber($("labor").value, { label: "Your time" });
+      const other = parseNumber($("other").value, { label: "Other costs" });
+
+      setFieldFeedback($("grams"), grams.error);
+      setFieldFeedback($("hours"), hours.error);
+      setFieldFeedback($("minutes"), minutes.error);
+      setFieldFeedback($("labor"), labor.error);
+      setFieldFeedback($("other"), other.error);
+
+      const parts = [grams, hours, minutes, labor, other];
+      if (parts.some((p) => p.status === "error")) return { state: "error" };
+      if (parts.some((p) => p.status === "empty")) return { state: "incomplete" };
+      return {
+        state: "ok",
+        job: {
+          grams: grams.value,
+          hours: hoursFromParts(hours.value, minutes.value),
+          laborMinutes: labor.value,
+          otherCost: other.value,
+        },
+      };
+    }
+
+    function render() {
+      const s = loadSettings();
+      const parsed = readJob();
+      const out = $("result");
+      out.replaceChildren();
+      $("rows").replaceChildren();
+
+      if (parsed.state === "error") {
+        const w = document.createElement("p");
+        w.className = "alert alert-danger mb-0";
+        w.textContent = "Fix the highlighted fields to see the cost.";
+        out.append(w);
+        return;
+      }
+      if (parsed.state === "incomplete") {
+        const w = document.createElement("p");
+        w.className = "alert alert-secondary mb-0";
+        w.textContent = "Enter the print details to see the cost.";
+        out.append(w);
+        return;
+      }
+
+      const r = calcCost(s, parsed.job);
+      const money = (n) => `${s.currency}${n.toFixed(2)}`;
+      const rows = LINES.map(([key, label]) => {
+        const tr = document.createElement("tr");
+        const th = document.createElement("td"), td = document.createElement("td");
+        th.textContent = label;
+        td.textContent = money(r[key]);
+        td.className = "text-end";
+        if (key === "cost") tr.className = "fw-semibold";
+        tr.append(th, td);
+        return tr;
+      });
+      $("rows").replaceChildren(...rows);
+
+      if (r.price === null) {
+        const w = document.createElement("p");
+        w.className = "alert alert-warning mb-0";
+        w.textContent = "Fees and your profit share add up to 100% or more, so no price works. Lower one of them in your settings.";
+        out.append(w);
+        return;
+      }
+      const row = document.createElement("div");
+      row.className = "row text-center g-2";
+      for (const [label, value, big] of [["Estimated cost", r.cost, false], ["Suggested price", r.price, true], ["Estimated profit", r.profit, false]]) {
+        const col = document.createElement("div");
+        col.className = "col-4";
+        const l = document.createElement("div");
+        l.className = "small text-secondary";
+        l.textContent = label;
+        const v = document.createElement("div");
+        v.className = big ? "fs-3 fw-bold accent-text" : "fs-5";
+        v.textContent = money(value);
+        col.append(l, v);
+        row.append(col);
+      }
+      const fees = document.createElement("p");
+      fees.className = "small text-secondary text-center mt-2 mb-0";
+      fees.textContent = `Marketplace fees taken out of the price: ${money(r.fees)}`;
+      out.append(row, fees);
+    }
+
+    mountSettings($("settings"), render);
+    ["grams", "hours", "minutes", "labor", "other"].forEach((id) => $(id).addEventListener("input", render));
+    const q = new URLSearchParams(location.search);
+    const gramsQ = parseFloat(q.get("grams"));
+    if (Number.isFinite(gramsQ) && gramsQ >= 0) $("grams").value = gramsQ;
+    const hoursQ = parseFloat(q.get("hours"));
+    if (Number.isFinite(hoursQ) && hoursQ >= 0) {
+      const parts = splitDecimalHours(hoursQ);
+      $("hours").value = parts.hours;
+      $("minutes").value = parts.minutes;
+    }
+    render();
+  </script>
+</body>
+</html>

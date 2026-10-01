@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enough filament? 3D printing spool check - BloxVault</title>
+  <meta name="description" content="Weigh your filament spool and find out whether there is enough left to finish a print.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar px-3">
+    <a class="navbar-brand fw-bold" href="index.html">BloxVault</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sm btn-outline-light" href="fit.html">Fit</a>
+      <a class="btn btn-sm btn-outline-light" href="spool.html">Spool</a>
+      <a class="btn btn-sm btn-outline-light" href="gcode.html">G-code</a>
+      <a class="btn btn-sm btn-outline-light" href="cost.html">Cost</a>
+      <a class="btn btn-sm btn-outline-light" href="account.html">Account</a>
+    </div>
+  </nav>
+  <main class="container py-4">
+    <h1 class="h3">Enough filament? Spool check</h1>
+    <p class="text-secondary narrow-text">Use this before a long print, to make sure the spool won't run out halfway.</p>
+    <div id="settings" class="mb-4"></div>
+    
+    <div class="row g-4">
+      <div class="col-md-6"><div class="card p-4 vstack gap-3">
+        <div><button type="button" class="btn btn-sm btn-outline-light" id="example">Try an example</button></div>
+        <div><label class="form-label" for="weighed">Spool weight now (g)</label><input id="weighed" class="form-control" type="number" min="0" step="1" value="620"><div class="form-text">Put the spool on a kitchen scale.</div></div><div><label class="form-label" for="empty">Empty spool weight (g)</label><input id="empty" class="form-control" type="number" min="0" step="1" value="200"><div class="form-text">Varies by brand. Weigh an empty one if you can.</div></div><div><label class="form-label" for="pg">This print needs (g)</label><input id="pg" class="form-control" type="number" min="0" step="1" value="150"><div class="form-text">Your slicer shows this after slicing.</div></div><div><label class="form-label" for="buf">Safety margin (%)</label><input id="buf" class="form-control" type="number" min="0" step="1" value="10"><div class="form-text">Extra filament for purging and small errors. 10 is a fair start.</div></div>
+      </div></div>
+      <div class="col-md-6"><div class="card result-card p-4"><h2 class="h5">Result</h2><div id="result"></div></div></div>
+    </div>
+    <section class="mt-5 narrow-text"><h2 class="h5">How it works</h2><p>Weigh the spool and subtract the empty spool's weight to get the filament left. The tool compares that with the print's weight plus your safety margin.</p></section>
+  <section class="mt-5"><h2 class="h6 text-secondary">Related tools</h2><div class="d-flex flex-wrap gap-2"><a class="btn btn-sm btn-outline-light" href="cost.html">Print cost and pricing</a><a class="btn btn-sm btn-outline-light" href="fit.html">Will it fit?</a></div></section>
+  </main>
+  <footer class="site-footer border-top mt-5">
+    <div class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3 small text-secondary">
+      <span>Estimates only. Your slicer and printer have the final say. &copy; <span id="year">2026</span> BloxVault</span>
+      <nav class="d-flex flex-wrap gap-3" aria-label="Site information">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="disclaimer.html">Disclaimer</a>
+      </nav>
+    </div>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script type="module">
+    import { loadSettings, mountSettings } from "./settings.js";
+    import { calcSpool } from "./calc.js";
+    import { showResult, parseNumber, setFieldFeedback } from "./ui.js";
+    const $ = (id) => document.getElementById(id);
+
+    function readSpool() {
+      const weighed = parseNumber($("weighed").value, { label: "Spool weight" });
+      const empty = parseNumber($("empty").value, { label: "Empty spool weight" });
+      const print = parseNumber($("pg").value, { label: "Print weight" });
+      const buffer = parseNumber($("buf").value, { min: 0, max: 100, label: "Safety margin" });
+      setFieldFeedback($("weighed"), weighed.error);
+      setFieldFeedback($("empty"), empty.error);
+      setFieldFeedback($("pg"), print.error);
+      setFieldFeedback($("buf"), buffer.error);
+      const parts = [weighed, empty, print, buffer];
+      if (parts.some((p) => p.status === "error")) return { state: "error" };
+      if (parts.some((p) => p.status === "empty")) return { state: "incomplete" };
+      return {
+        state: "ok",
+        job: { weighed: weighed.value, empty: empty.value, print: print.value, bufferPct: buffer.value },
+      };
+    }
+
+    function render() {
+      const parsed = readSpool();
+      if (parsed.state === "error") {
+        return showResult("result", { kind: "danger", headline: "Fix the highlighted fields to check the spool.", lines: [] });
+      }
+      if (parsed.state === "incomplete") {
+        return showResult("result", { kind: "secondary", headline: "Enter the spool's weight and the print's weight.", lines: [] });
+      }
+      const r = calcSpool(parsed.job);
+      if (!r) return showResult("result", { kind: "secondary", headline: "Enter the spool's weight and the print's weight.", lines: [] });
+      showResult("result", {
+        kind: r.enough ? "success" : "warning",
+        headline: r.enough ? "There's enough filament." : "Not enough filament. Use a fresh spool.",
+        lines: [
+          `Available on the spool: ${r.remaining.toFixed(0)} g`,
+          `Print needs: ${r.required.toFixed(0)} g`,
+          `Safety margin: ${r.margin.toFixed(0)} g`,
+          r.enough ? `Left after the print: ${r.spare.toFixed(0)} g` : `Short by: ${(-r.spare).toFixed(0)} g`,
+          `About ${r.printsLeft} print${r.printsLeft === 1 ? "" : "s"} like this left on the spool`,
+        ],
+      });
+      const share = r.remaining > 0 ? Math.min(100, (r.needed / r.remaining) * 100) : 100;
+      const bar = document.createElement("div");
+      bar.className = "progress mt-3";
+      bar.setAttribute("role", "progressbar");
+      bar.setAttribute("aria-label", "Share of the remaining filament this print uses");
+      bar.setAttribute("aria-valuenow", share.toFixed(0));
+      const fill = document.createElement("div");
+      fill.className = `progress-bar ${r.enough ? "bg-success" : "bg-danger"}`;
+      fill.style.width = `${share}%`;
+      bar.append(fill);
+      const cap = document.createElement("div");
+      cap.className = "small text-secondary mt-1";
+      cap.textContent = `This print uses ${share.toFixed(0)}% of the filament left on the spool.`;
+      document.getElementById("result").append(bar, cap);
+    }
+    ["weighed", "empty", "pg", "buf"].forEach((id) => $(id).addEventListener("input", render));
+    $("example").addEventListener("click", () => { $("weighed").value = 620; $("empty").value = 200; $("pg").value = 150; $("buf").value = 10; render(); });
+    $("empty").value = loadSettings().emptySpoolGrams;
+    mountSettings($("settings"), (s) => { $("empty").value = s.emptySpoolGrams; render(); });
+    render();
+  </script>
+</body>
+</html>

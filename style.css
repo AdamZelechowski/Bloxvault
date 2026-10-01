@@ -1,0 +1,54 @@
+:root { --accent: #ff7700; --accent-hover: #ff9933; }
+
+body { background: #121212; }
+.narrow { max-width: 420px; }
+
+.navbar { background: #1a1a1a; border-bottom: 2px solid var(--accent); }
+.navbar-brand { color: var(--accent); }
+
+.card { background: #1e1e1e; border: 1px solid #2f2f2f; border-radius: 12px; }
+
+.btn-primary {
+  --bs-btn-color: #000;
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: #000;
+  --bs-btn-hover-bg: var(--accent-hover);
+  --bs-btn-hover-border-color: var(--accent-hover);
+  --bs-btn-active-color: #000;
+  --bs-btn-active-bg: var(--accent-hover);
+  --bs-btn-active-border-color: var(--accent-hover);
+}
+.btn-link { --bs-btn-color: var(--accent); --bs-btn-hover-color: var(--accent-hover); }
+
+:root { --bs-link-color-rgb: 255, 119, 0; --bs-link-hover-color-rgb: 255, 153, 51; }
+.narrow-text { max-width: 60ch; }
+.tool-card { text-decoration: none; color: inherit; }
+.tool-card:hover, .tool-card:focus-visible { border-color: var(--accent-hover); }
+
+summary { cursor: pointer; }
+dt { margin-top: 0.6rem; }
+
+.result-card { border-color: var(--accent); }
+.accent-text { color: var(--accent); }
+
+/* layout and type */
+body { line-height: 1.6; }
+h1, h2, h3, .h1, .h2, .h3 { letter-spacing: -0.01em; }
+main.container { max-width: 1040px; }
+.hero h1 { max-width: 22ch; }
+
+/* touch targets */
+.form-control, .btn { min-height: 44px; }
+.btn-sm { min-height: 36px; }
+
+/* my setup dialog */
+dialog.setup-dialog { width: min(680px, 94vw); max-height: 90vh; padding: 0; border: 1px solid #2f2f2f; border-radius: 12px; background: #1e1e1e; color: var(--bs-body-color); }
+dialog.setup-dialog::backdrop { background: rgba(0, 0, 0, 0.65); }
+.setup-dialog .dialog-body { padding: 1.25rem; max-height: 90vh; overflow-y: auto; }
+.invalid-feedback { display: none; }
+.form-control.is-invalid ~ .invalid-feedback { display: block; }
+
+/* motion: small and purposeful */
+.card, .btn { transition: border-color 0.15s ease, background-color 0.15s ease; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
